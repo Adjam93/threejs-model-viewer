@@ -770,34 +770,7 @@
                                             // + '<br>'
                                             //+ 'Model Position: ' + position.x + ',' + position.y + ',' + position.z;
                                         }
-
-                                        // create custom material from the shader code above
-                                        //   that is within specially labeled script tags
-
-                                       /*var customMaterial = new THREE.ShaderMaterial(
-                                         {
-                                            uniforms:
-                                            {
-                                                "c": { type: "f", value: 1 },
-                                                "p": { type: "f", value: 1.4 },
-                                                glowColor: { type: "c", value: new THREE.Color(0xffff00) },
-                                                viewVector: { type: "v3", value: camera.position }
-                                            },
-                                            vertexShader: document.getElementById('vertexShader2').textContent,
-                                            fragmentShader: document.getElementById('fragmentShader2').textContent,
-                                            side: THREE.BackSide,
-                                            blending: THREE.AdditiveBlending,
-                                            transparent: true,
-                                            depthWrite: false
-                                        });*/
-
-
-                                      /*  var outlineMaterial2 = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.BackSide });
-                                        var model2 = new THREE.Mesh(geometry, outlineMaterial2);
-                                        model2.position = model.position;
-                                        model2.scale.multiplyScalar(1.028);
-                                        scene.add(model2);*/
-
+                                        
                                         child.material = default_material;
 
                                         var geo = new THREE.EdgesGeometry(child.geometry); // or WireframeGeometry
