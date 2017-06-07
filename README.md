@@ -15,4 +15,4 @@ An application using the Three.js library to allow user to load .obj files and v
 - Scale the model up and down
 - Add view helpers such as bounding box, square/circular grid underneath model and an axis
 
-<h2><a href="http://adjam.heliohost.org/3d-viewer">DEMO</a></h2>
+<h2><a href="http://adjam.heliohost.org/3d-viewer" target="_blank">DEMO</a></h2>
