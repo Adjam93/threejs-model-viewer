@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -24,7 +24,7 @@
     <script src="js/THREEx.FullScreen.js"></script>
     <script src="js/jquery.nicescroll.js"></script>
     <script src="js/spectrum.js"></script>
-    
+
     <script src="frameworks/loaders/ColladaLoader.js"></script>
     <script src="frameworks/loaders/collada/Animation.js"></script>
     <script src="frameworks/loaders/collada/AnimationHandler.js"></script>
@@ -79,6 +79,7 @@
     <div id="container">
         <div id="stats"></div>
 
+        
         <!--Side Menu Start-->
         <div class="side_menu">
 
@@ -246,7 +247,7 @@
                     </ul>
                 </li>             
             </ul> 
-            <button id="Rotate_X">Rotate X</button>
+           
             <div id="disp_tmp_path"></div>               
         </div> 
         <!--Side Menu End-->
@@ -266,7 +267,8 @@
                                 <input type="checkbox" id="rotation">
                                 <span class="toggle round"></span>
                             </label>                                                                            
-                        </li>         
+                        </li> 
+                        <li><button id="Rotate_X">Rotate X</button></li>
                     </ul>
                 </li>
 
@@ -324,7 +326,7 @@
                 <img src="images/fullscreen.png" width="32" height="32" alt="fullscreen" />
             </button>
         </div>
-
+        
         <script>
             $(document).ready(function () {
 
@@ -380,13 +382,12 @@
         <script>
             var view = document.getElementById('main_viewer');
 
-            var camera, camerHelper, scene, renderer, stats, controls, model, glowModel,
-                delta, raycaster, mouse, phongMaterial;
+            var camera, camerHelper, scene, renderer, stats, controls, model, glowModel, delta;
 
             var modelLoaded = false;
             var bg_Texture = false;
 
-            var glowMaterial, glow_value;
+            var glow_value;
  
             var ambient, directionalLight, directionalLight2, directionalLight3, bg_colour;
             var backgroundScene, backgroundCamera, backgroundMesh;
@@ -405,6 +406,41 @@
             var bBox = document.getElementById('bBox');
 
             var statsNode = document.getElementById('stats');
+
+            //X-RAY SHADER MATERIAL
+            //http://free-tutorials.org/shader-x-ray-effect-with-three-js/
+            var materials = {
+                default_material: new THREE.MeshLambertMaterial({ side: THREE.DoubleSide }),
+                wireframeMaterial: new THREE.MeshPhongMaterial({
+                    side: THREE.DoubleSide,
+                        wireframe: true, shininess: 100,
+                        specular: 0x000,emissive: 0x000,
+                        shading: THREE.SmoothShading, depthWrite: true, depthTest: true
+                    }),
+                phongMaterial: new THREE.MeshPhongMaterial({
+                    color: 0x555555, specular: 0xffffff, shininess: 10,
+                    shading: THREE.SmoothShading, side: THREE.DoubleSide
+                }),
+                xrayMaterial: new THREE.ShaderMaterial({
+                    uniforms: {
+                        p: { type: "f", value: 3 },
+                        glowColor: { type: "c", value: new THREE.Color(0x84ccff) },
+                    },
+                    vertexShader: document.getElementById('vertexShader').textContent,
+                    fragmentShader: document.getElementById('fragmentShader').textContent,
+                    side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+                    transparent: true,depthWrite: false
+                }),
+                glowMaterial: new THREE.ShaderMaterial({
+                    uniforms: {
+                        p: { type: "f", value: 0.1 },
+                        glowColor: { type: "c", value: new THREE.Color(0xffff80) },
+                    },
+                    vertexShader: document.getElementById('vertexShader').textContent,
+                    fragmentShader: document.getElementById('fragmentShader').textContent,
+                    side: THREE.BackSide, blending: THREE.AdditiveBlending, transparent: true
+                })
+            };
 
             var clock = new THREE.Clock();
 
@@ -465,7 +501,8 @@
                 }
                 document.getElementById('fullscreenBtn').addEventListener('click', function () {
                     toggleFullscreen();
-                }); 
+                });
+
 
                 ambient = new THREE.AmbientLight(0x404040);
 
@@ -486,8 +523,32 @@
                 directionalLight2.position.set(0, 0, -1).normalize();
                 scene.add(directionalLight2);
 
+                directionalLight3 = new THREE.DirectionalLight(0xffeedd);
+                directionalLight3.position.set(0, 1, 0).normalize();
+                scene.add(directionalLight3);
+
                 var ambientLight = new THREE.AmbientLight(0x808080, 0.2); //Grey colour, low intensity
                 scene.add(ambientLight);
+
+                //var ambientLight = new THREE.AmbientLight(0x808080, 0.2); //Grey colour, low intensity
+                //scene.add(ambientLight);
+                
+
+               /* var ambientLight = new THREE.AmbientLight(0x000000);
+                scene.add(ambientLight)
+
+                var lights = [];
+                lights[0] = new THREE.PointLight(0xffeedd, 1, 0);
+                lights[1] = new THREE.PointLight(0xffeedd, 1, 0);
+                lights[2] = new THREE.PointLight(0xffeedd, 1, 0);
+
+                lights[0].position.set(0, 0, 200); //LIGHTS POSITION SET DISTANCE BASED ON LOADED OBJECT BOUNDING BOX MAX Y/Z
+                lights[1].position.set(0, 0, -200);
+                lights[2].position.set(0, 200, 0);
+
+                scene.add(lights[0]);
+                scene.add(lights[1]);
+                scene.add(lights[2]);*/
 
                /* var groundGeometry = new THREE.BoxGeometry(30, 0.01, 40);
                 var groundMaterial = new THREE.MeshLambertMaterial({ color: 'rgb(0,130,0)' });
@@ -497,8 +558,8 @@
 
                 controls = new THREE.OrbitControls(camera, renderer.domElement);
                 /*controls.maxPolarAngle = Math.PI * 0.5;*/
-                // controls.minDistance = 0.5;
-                //controls.maxDistance = 1180;
+                 //controls.minDistance = 0.5;
+               // controls.maxDistance = 1180;
 
                 //Colour changer, to set background colour of renderer to user chosen colour
                 $(".bg_select").spectrum({
@@ -550,31 +611,10 @@
                 $('#remove_bg').click(function () {
                     backgroundScene.remove(backgroundMesh); //remove background mesh containing the image
                 });
-
-                /*loadDAE("model/", "avatar.dae", scene, function (obj) {
-                    monster = obj;
-                    render();
-                });*/
                 
                 document.getElementById('obj_file').addEventListener('change', readFile, false); //Read .obj file
 
                 document.getElementById('mtl_file').addEventListener('change', readMTL, false);
-
-                /***MATERIALS***/
-
-                //Default Material
-                var default_material = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide });
-
-                //var default_material = new THREE.MeshNormalMaterial();
-
-                var wireframeMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: true, transparent: true });
-
-                phongMaterial = new THREE.MeshPhongMaterial({
-                    color: 0x555555,
-                    specular: 0xffffff, shininess: 10,
-                    shading: THREE.SmoothShading,
-                    side: THREE.DoubleSide
-                }); //Phong for reflectivity 
 
                 //jQuery slider for phong shininess level
                 $("#shine").slider({
@@ -583,7 +623,7 @@
                     max: 500,
                     value: 10,
                     slide: function (event, ui) {
-                        phongMaterial.shininess = ui.value; //Set speed variable to the current selected value of slider
+                        materials.phongMaterial.shininess = ui.value; //Set shininess parameter to the current selected value of slider
                     }
                 });
 
@@ -591,45 +631,9 @@
                     change: function (event, ui)
                     {
                         console.log(ui.value);
-                        phongMaterial.shininess = ui.value; //Set shininess of phong material to value from the slider
+                        materials.phongMaterial.shininess = ui.value; //Set shininess of phong material to value from the slider
                     }
                  });
-
-                /***********CHANGE ABOVE AS INITIAL BASIC MATERIAL FOR LOADED MODEL***********/
-
-                /***********CAN ALSO USE IT FOR MULTIPLE MATERIAL OPTIONS E.G. PHONG SHADING AND SMOOTH SHADING***********/
-
-
-                //X-RAY SHADER MATERIAL
-                //http://free-tutorials.org/shader-x-ray-effect-with-three-js/
-                var $$ = document.querySelector.bind(document);
-
-                xrayMaterial = new THREE.ShaderMaterial({
-                    uniforms: {
-                        p: { type: "f", value: 3 },
-                        glowColor: { type: "c", value: new THREE.Color(0x84ccff) },
-                    },
-                    vertexShader: $$('#vertexShader').text,
-                    fragmentShader: $$('#fragmentShader').text,
-                    side: THREE.DoubleSide,
-                    blending: THREE.AdditiveBlending,
-                    transparent: true,
-                    depthWrite: false
-                    //wireframe: true //wireframe could be added, to view x-ray and wireframe combined view
-                });
-
-                //GLOW SHADER MATERIAL
-                glowMaterial = new THREE.ShaderMaterial({
-                    uniforms: {
-                        p: { type: "f", value: 0.1 },
-                        glowColor: { type: "c", value: new THREE.Color(0xffff80) },
-                    },
-                    vertexShader: document.getElementById('vertexShader').textContent,
-                    fragmentShader: document.getElementById('fragmentShader').textContent,
-                    side: THREE.BackSide,
-                    blending: THREE.AdditiveBlending,
-                    transparent: true
-                });
 
                 $(".glow_select").spectrum({
                     color: "#fff",
@@ -637,11 +641,10 @@
                         $("#basic-log").text("Hex Colour Selected: " + color.toHexString()); //Log information
                         glow_value = $(".glow_select").spectrum('get').toHexString(); //Get the colour selected
                         //Set glow material colour to selected value
-                        glowMaterial.uniforms.glowColor.type = "c";
-                        glowMaterial.uniforms.glowColor.value = new THREE.Color(glow_value);
+                        materials.glowMaterial.uniforms.glowColor.type = "c";
+                        materials.glowMaterial.uniforms.glowColor.value = new THREE.Color(glow_value);
                     }
                 });
-
 
                 //TESTING IMAGE UPLOADING, FOR POSSIBLE USE WITH MODEL .MTL FILE
                 var filesInput = document.getElementById("images");
@@ -770,8 +773,35 @@
                                             // + '<br>'
                                             //+ 'Model Position: ' + position.x + ',' + position.y + ',' + position.z;
                                         }
-                                        
-                                        child.material = default_material;
+
+                                        // create custom material from the shader code above
+                                        //   that is within specially labeled script tags
+
+                                       /*var customMaterial = new THREE.ShaderMaterial(
+                                         {
+                                            uniforms:
+                                            {
+                                                "c": { type: "f", value: 1 },
+                                                "p": { type: "f", value: 1.4 },
+                                                glowColor: { type: "c", value: new THREE.Color(0xffff00) },
+                                                viewVector: { type: "v3", value: camera.position }
+                                            },
+                                            vertexShader: document.getElementById('vertexShader2').textContent,
+                                            fragmentShader: document.getElementById('fragmentShader2').textContent,
+                                            side: THREE.BackSide,
+                                            blending: THREE.AdditiveBlending,
+                                            transparent: true,
+                                            depthWrite: false
+                                        });*/
+
+
+                                      /*  var outlineMaterial2 = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.BackSide });
+                                        var model2 = new THREE.Mesh(geometry, outlineMaterial2);
+                                        model2.position = model.position;
+                                        model2.scale.multiplyScalar(1.028);
+                                        scene.add(model2);*/
+
+                                        child.material = materials.default_material;
 
                                         var geo = new THREE.EdgesGeometry(child.geometry); // or WireframeGeometry
                                         var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
@@ -779,45 +809,45 @@
 
                                         $('#wire_check').change(function () {
                                             if (wire.checked) {
-                                                child.material = wireframeMaterial;
+                                                child.material = materials.wireframeMaterial;
                                                 model_wire.checked = false;
                                             }
                                             else if (phong.checked) {
-                                                child.material = phongMaterial;
+                                                child.material = materials.phongMaterial;
                                                 //if phong shading is on when selecting wireframe, go back to phong, when wireframe is off
                                             }
                                             else {
-                                                child.material = default_material;
+                                                child.material = materials.default_material;
                                             }
                                         });
 
                                         $('#model_wire').change(function () {
                                             if (model_wire.checked) {
                                                     wire.checked = false;
-                                                    child.material = default_material;
+                                                    child.material = materials.default_material;
                                                     child.add(wireframe);                                                                                          
                                             }                                          
                                             else {
-                                                child.material = default_material;
+                                                child.material = materials.default_material;
                                                 child.remove(wireframe);
                                             }
                                         });
 
                                         $('#phong_check').change(function () {
                                             if (phong.checked) {
-                                                child.material = phongMaterial;
+                                                child.material = materials.phongMaterial;
                                             }
                                             else {
-                                                child.material = default_material;
+                                                child.material = materials.default_material;
                                             }
                                         });
 
                                         $('#xray_check').change(function () {
                                             if (xray.checked) {
-                                                child.material = xrayMaterial;
+                                                child.material = materials.xrayMaterial;
                                             }
                                             else {
-                                                child.material = default_material;
+                                                child.material = materials.default_material;
                                             }
                                         });
 
@@ -834,7 +864,7 @@
                                             else {
                                                 glowMaterial.visible = false;
                                                 scene.remove(glowModel);
-                                                child.material = default_material;
+                                                child.material = materials.default_material;
                                             }
                                         });
 
@@ -847,11 +877,31 @@
                                 bound_box.visible = false;
                                 model.add(bound_box); //Add bounding box helper to model (when checkbox is checked)
 
-                                var bbox = new THREE.Box3();
-                                bbox.setFromObject(model);
+                                var bbox = new THREE.Box3().setFromObject(model);
                                 console.log(bbox.min.y);
                                
-                                
+
+                                /*MODELS OF DIFFERENT SIZES TO FIT IN CAMERA VIEW*/
+                                var height = bbox.getSize().y;
+                                var dist = height / (2 * Math.tan(camera.fov * Math.PI / 360));
+                                var pos = scene.position; //model.position;                               
+                                camera.position.set(pos.x, pos.y, dist * 3.50);
+                                camera.lookAt(pos);
+
+                                //calc cam pos from Bounding Box
+                               /* var BB = new THREE.Box3().setFromObject(model);
+                                var centerpoint = BB.center();
+                                var size = BB.size();
+                                var backup = (size.y / 2) / Math.sin((camera.fov / 2) * (Math.PI / 180));
+                                var camZpos = BB.max.z + backup + camera.near;
+                                //move cam
+                                camera.position.set(centerpoint.x, centerpoint.y, camZpos);
+                                camera.far = camera.near + 10 * size.z;
+                                camera.updateProjectionMatrix();
+                                /*MODELS OF DIFFERENT SIZES TO FIT IN CAMERA VIEW*/
+
+
+
                                //Bounding Sphere with radius set based on non visible model box
                                /* var geometry2 = new THREE.SphereGeometry(bbox.max.z * 3, 32, 16);
                                 var material = new THREE.MeshLambertMaterial({ wireframe: true, color: 0x000088 });
@@ -923,7 +973,7 @@
                     }
                 }
 
-
+                //FUNCTION FOR LOADING DIFFERENT FILE TYPE (.DAE), THIS FILE TYPE CAN CONTAIN ANIMATIONS
                 function loadDAE(path, fileOBJ, scene, fSuc) {
                     var loader = new THREE.ColladaLoader();
                     var onProgress = function (xhr) { };
@@ -989,7 +1039,7 @@
                 function removeModel() {
                     scene.remove(model);
                     scene.remove(glowModel); //Remove glow model if present
-                    glowMaterial.visible = false;
+                    materials.glowMaterial.visible = false;
                     camera.position.set(0, 0, 20); //Reset camera to initial position
                     controls.reset(); //Reset controls, for when previous object has been moved around e.g. larger object = larger rotation
                     statsNode.innerHTML = ''; //Reset stats box (faces, vertices etc)
@@ -1081,6 +1131,7 @@
                 var colour = getColours($('#red').slider("value"), $('#green').slider("value"), $('#blue').slider("value"));
                 directionalLight.color.setRGB(colour[0], colour[1], colour[2]);
                 directionalLight2.color.setRGB(colour[0], colour[1], colour[2]);
+                directionalLight3.color.setRGB(colour[0], colour[1], colour[2]);
 
                 var colour = getColours($('#ambient_red').slider("value"), $('#ambient_green').slider("value"),
                                         $('#ambient_blue').slider("value"));
@@ -1095,8 +1146,9 @@
   
             function render() {
                 setColours();
+
                 //animations
-                THREE.AnimationHandler.update(delta);
+               // THREE.AnimationHandler.update(delta);
 
                 if (bg_Texture)
                 {
