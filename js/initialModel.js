@@ -1,4 +1,4 @@
-﻿var scale2 = 1;
+var scale2 = 1;
 
 var gridHelper;
 $('#grid').change(function () {
@@ -41,55 +41,6 @@ $('#bBox').change(function () {
     }
 });
 
-var wireframeMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, wireframe: true, transparent: true });
-
-var phongMaterial = new THREE.MeshPhongMaterial({
-    color: 0x555555,
-    specular: 0xffffff, shininess: 10,
-    shading: THREE.SmoothShading,
-    side: THREE.DoubleSide
-}); //Phong for reflectivity 
-
-var default_material = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide }); //new THREE.MeshLambertMaterial({ color: 0x737373 });
-
-var $$ = document.querySelector.bind(document);
-
-xrayMaterial = new THREE.ShaderMaterial({
-    uniforms: {
-        p: { type: "f", value: 3 },
-        glowColor: { type: "c", value: new THREE.Color(0x84ccff) },
-    },
-    vertexShader: $$('#vertexShader').text,
-    fragmentShader: $$('#fragmentShader').text,
-    side: THREE.DoubleSide,
-    blending: THREE.AdditiveBlending,
-    transparent: true,
-    depthWrite: false
-   // wireframe: true //wireframe could be added, to view x-ray and wireframe combined view
-});
-
-glowMaterial = new THREE.ShaderMaterial({
-    uniforms: {
-        p: { type: "f", value: 0.1 },
-        glowColor: { type: "c", value: new THREE.Color(0xffff80) },
-    },
-    vertexShader: document.getElementById('vertexShader').textContent,
-    fragmentShader: document.getElementById('fragmentShader').textContent,
-    side: THREE.BackSide,
-    blending: THREE.AdditiveBlending,
-    transparent: true
-});
-
-$(".glow_select").spectrum({
-    color: "#fff",
-    change: function (color) {
-        $("#basic-log").text("Hex Colour Selected: " + color.toHexString()); //Log information
-        glow_value = $(".glow_select").spectrum('get').toHexString(); //Get the colour selected
-        glowMaterial.uniforms.glowColor.type = "c";
-        glowMaterial.uniforms.glowColor.value = new THREE.Color(glow_value);
-    }
-});
-
 var objLoader = new THREE.OBJLoader();
 objLoader.setPath('model/');
 objLoader.load('crash2.obj', function (object) {
@@ -114,54 +65,54 @@ objLoader.load('crash2.obj', function (object) {
                 //+ 'Model Position: ' + position.x + ',' + position.y + ',' + position.z;
             }
 
-            child.material = default_material;
+            child.material = materials.default_material;
 
             var geo = new THREE.EdgesGeometry(child.geometry); // or WireframeGeometry
-            var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2});
-            var wireframe = new THREE.LineSegments(geo, mat);           
+            var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+            var wireframe = new THREE.LineSegments(geo, mat);
 
             $('#wire_check').change(function () {
                 if (wire.checked) {
+                    child.material = materials.wireframeMaterial;
                     model_wire.checked = false;
-                    child.material = wireframeMaterial;
                 }
                 else if (phong.checked) {
-                    child.material = phongMaterial;
+                    child.material = materials.phongMaterial;
                     //if phong shading is on when selecting wireframe, go back to phong, when wireframe is off
                 }
                 else {
-                    child.material = default_material;
+                    child.material = materials.default_material;
                 }
             });
 
             $('#model_wire').change(function () {
                 if (model_wire.checked) {
-                        wire.checked = false;
-                        child.material = default_material;
-                        child.add(wireframe);
+                    wire.checked = false;
+                    child.material = materials.default_material;
+                    child.add(wireframe);
                 }
                 else {
-                    child.material = default_material;
+                    child.material = materials.default_material;
                     child.remove(wireframe);
                 }
             });
 
             $('#phong_check').change(function () {
                 if (phong.checked) {
-                    child.material = phongMaterial;
+                    child.material = materials.phongMaterial;
                 }
                 else {
-                    child.material = default_material;
+                    child.material = materials.default_material;
                 }
             });
 
             $('#xray_check').change(function () {
                 if (xray.checked) {
-                    child.material = xrayMaterial;
+                    child.material = materials.xrayMaterial;
                 }
                 else {
-                    child.material = default_material;
-                } 
+                    child.material = materials.default_material;
+                }
             });
 
             glowModel = new THREE.Mesh(child.geometry, glowMaterial);
@@ -173,17 +124,15 @@ objLoader.load('crash2.obj', function (object) {
             $('#glow_check').change(function () {
                 if (glow.checked) {
                     glowMaterial.visible = true;
-                    // scene.add(glowModel);
                 }
                 else {
                     glowMaterial.visible = false;
                     scene.remove(glowModel);
-                    child.material = default_material;
+                    child.material = materials.default_material;
                 }
             });
         }
-    });
-
+    });  
 
     bound_box = new THREE.BoxHelper(object); //, 0xffffff
     bound_box.visible = false;
