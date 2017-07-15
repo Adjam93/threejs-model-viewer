@@ -405,6 +405,7 @@ function selectModel() {
     var index = select.selectedIndex;
 
     if (index >= 0) {
+        removeModel();
         switchScene(index);
     }
 
