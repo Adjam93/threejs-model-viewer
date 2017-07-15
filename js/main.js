@@ -1,4 +1,4 @@
-﻿var view = document.getElementById('main_viewer');
+var view = document.getElementById('main_viewer');
 
 var camera, camerHelper, scene, renderer, loader,
     stats, controls, model, sample_model, glowModel, delta;
@@ -201,10 +201,24 @@ function initScene(index) {
     loader = new THREE.OBJLoader();
     var url = sceneInfo.url;
 
+    //progress/loading bar
+    var onProgress = function (data) {
+        if (data.lengthComputable) { //if size of file transfer is known
+            var percentage = Math.round((data.loaded * 100) / data.total);
+            console.log(percentage);
+            statsNode.innerHTML = 'Loaded : ' + percentage + '%' + ' of ' + sceneInfo.name
+            + '<progress value="0" max="100" class="progress"></progress>';
+            $('.progress').css({ 'width': percentage + '%' });
+            $('.progress').val(percentage);
+        }
+    }
+    var onError = function (xhr) {
+        console.log('ERROR');
+    };
+
     loader.load(url, function (data) {
 
         sample_model = data;
-
         sample_model_loaded = true;
 
         sample_model.traverse(function (child) {
@@ -231,10 +245,10 @@ function initScene(index) {
             }
         });
 
-        if (sceneInfo.modelPos) {
-            sample_model.position.copy(sceneInfo.modelPos);
+        if (sceneInfo.objectRotation) {
+            sample_model.rotation.copy(sceneInfo.objectRotation);
         }
-
+       
         setCamera(sample_model);
 
         setBoundBox(sample_model);
@@ -243,8 +257,8 @@ function initScene(index) {
         setAxis(sample_model);
 
         scene.add(sample_model);
-    });
 
+    }, onProgress, onError);
 }
 
 function removeModel() {
@@ -369,20 +383,21 @@ function animate() {
 }
 var modelList = [
                     {
-                        name: "crash.obj", url: 'sample_models/crash2.obj',
-                        cameraPos: new THREE.Vector3(2, 1, 15)
+                        name: "crash.obj", url: 'sample_models/crash2.obj'
                     },
                     {
                         name: "bear.obj", url: 'sample_models/bear-obj.obj'
                     },
                     {
-                        name: "porsche.obj", url: 'sample_models/porsche.obj',
-                        modelPos: new THREE.Vector3(0, 0, -35)
+                        name: "car.obj", url: 'sample_models/car_white.obj',
+                        objectRotation: new THREE.Euler(0, 3 * Math.PI / 2, 0)
                     },
-                     {
-                         name: "tiger.obj", url: 'sample_models/Tiger.obj',
-                         modelPos: new THREE.Vector3(0, 0, -35)
-                     }
+                    {
+                        name: "tiger.obj", url: 'sample_models/Tiger.obj'
+                    },
+                    {
+                        name: "dinosaur.obj", url: 'sample_models/Dinosaur_V02.obj'
+                    }
 ];
 
 function switchScene(index) {
