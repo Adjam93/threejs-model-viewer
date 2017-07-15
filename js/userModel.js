@@ -56,6 +56,8 @@ function readFile(evt) {
                     }
                 });
 
+                setCamera(model);
+
                 model.position.set(0, 0, 0);
 
                 setBoundBox(model);
@@ -63,8 +65,12 @@ function readFile(evt) {
                 setGrid(model);
                 setAxis(model);
 
+                scaleUp(model);
+                scaleDown(model);
+
                 console.log(renderer.info.memory.geometries);
 
+                /*Some models may load in with incorrect rotation on X axis*/
                 $("#Rotate_X").click(function () {
 
                     model.rotation.x = -Math.PI / 2;
@@ -97,28 +103,3 @@ function readFile(evt) {
         }
     }
 }
-
-
-function scaleUp() {
-    if (modelLoaded) {
-        scale = scale + (scale * 0.55);
-        model.scale.x = model.scale.y = model.scale.z = scale;
-        camera.lookAt(model.position);
-        controls.reset();
-    }
-}
-function scaleDown() {
-    if (modelLoaded) {
-        scale = scale - (scale * 0.25);
-        model.scale.x = model.scale.y = model.scale.z = scale;
-        camera.lookAt(model.position);
-        controls.reset();
-    }
-}
-$('#scale_up').click(function (e) {
-    scaleUp();
-});
-
-$('#scale_down').click(function (e) {
-    scaleDown();
-});
