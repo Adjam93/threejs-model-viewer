@@ -1,4 +1,4 @@
-﻿function setCamera(mod) {
+function setCamera(mod) {
     var bbox = new THREE.Box3().setFromObject(mod);
 
     /*MODELS OF DIFFERENT SIZES TO FIT IN CAMERA VIEW*/
@@ -213,3 +213,30 @@ $(".glow_select").spectrum({
         materials.glowMaterial.uniforms.glowColor.value = new THREE.Color(glow_value);
     }
 });
+
+/*SCALE FUNCTIONS*/
+var scale = 1;
+
+function scaleUp(mod) {
+
+    $('#scale_up').click(function (e) {
+        if (modelLoaded || sample_model_loaded) {
+            scale = scale + (scale * 0.55);
+            mod.scale.x = mod.scale.y = mod.scale.z = scale;
+            camera.lookAt(mod.position);
+            controls.reset();
+        }
+    });
+}
+
+function scaleDown(mod) {
+
+    $('#scale_down').click(function (e) {
+        if (modelLoaded || sample_model_loaded) {
+            scale = scale - (scale * 0.25);
+            mod.scale.x = mod.scale.y = mod.scale.z = scale;
+            camera.lookAt(mod.position);
+            controls.reset();
+        }
+    });  
+}
