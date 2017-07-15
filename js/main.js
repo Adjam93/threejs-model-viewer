@@ -287,21 +287,9 @@ function removeModel() {
     $('#shine').slider("value", 10); //Set phong shine level back to initial
 }
 
-var fileSelect = document.getElementById('obj_file');
-fileSelect.onchange = function () {
-    if (fileSelect.value.length == 0) { //if user selects cancel from file opener dialog, keep current model in scene
-        console.log('Cancelled file selection');
-    }
-    else {
-        //When selecting a file, if a model is already present, remove current model before loading new model
-        removeModel();
-    }
-}
-
 $('#remove').click(function () {
     removeModel();
 });
-
 
 $("#red, #green, #blue, #ambient_red, #ambient_green, #ambient_blue").slider({
     change: function (event, ui) {
