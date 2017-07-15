@@ -11,7 +11,6 @@ var glow_value;
 var ambient, directionalLight, directionalLight2, directionalLight3, bg_colour;
 var backgroundScene, backgroundCamera, backgroundMesh;
 
-var scale = 1;
 var amb = document.getElementById('ambient_light');
 var rot1 = document.getElementById('rotation');
 var wire = document.getElementById('wire_check');
@@ -255,6 +254,9 @@ function initScene(index) {
         setPolarGrid(sample_model);
         setGrid(sample_model);
         setAxis(sample_model);
+
+        scaleUp(sample_model);
+        scaleDown(sample_model);
 
         scene.add(sample_model);
 
