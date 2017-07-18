@@ -2,6 +2,7 @@
 An application using the Three.js library to allow user to load .obj files and view them online with multiple viewing options.
 
 <b>Features:</b>
+- View sample models from dropdown list
 - Load .obj file into the 3D scene
 - View model information (name of model, number of vertices and faces)
 - Add ambient light and alter the colour
