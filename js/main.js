@@ -387,6 +387,9 @@ var modelList = [
                     },
                     {
                         name: "dinosaur.obj", url: 'sample_models/Dinosaur_V02.obj'
+                    },
+                    {
+                        name: "skeleton.obj", url: 'sample_models/skeleton.obj'
                     }
 ];
 
