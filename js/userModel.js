@@ -97,6 +97,7 @@ function readFile(evt) {
                 var percentage = Math.round((data.loaded * 100) / data.total);
                 console.log(percentage);
                 statsNode.innerHTML = 'Loaded : ' + percentage + '%' + ' of ' + fileObject.name
+                + '<br>'
                 + '<progress value="0" max="100" class="progress"></progress>';
                 // + 'Size of file ' + Math.round(size / 1048576) + 'Mbs';
                 $('.progress').css({ 'width': percentage + '%' });////Width of progress bar set to the current percentage of model loaded (progress bar therefore increases in width as model loads)
