@@ -11,7 +11,7 @@ An application using the Three.js library to allow user to load .obj files and v
 - Apply phong shading mode and increase/decrease the shininess level
 - View model in x-ray
 - Apply glow outline to model and set the colour of the glow model
-- Set background colour of the renderer and/or set selected image to be the background
+- Set background colour of the renderer or set selected image to be the background
 - Auto-rotate the model and adjust the rotation speed
 - Scale the model up and down
 - Add view helpers such as bounding box, square/circular grid underneath model and an axis
