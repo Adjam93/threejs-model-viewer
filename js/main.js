@@ -244,9 +244,9 @@ function initScene(index) {
             }
         });
 
-        if (sceneInfo.objectRotation) {
+        /*if (sceneInfo.objectRotation) {
             sample_model.rotation.copy(sceneInfo.objectRotation);
-        }
+        }*/
        
         setCamera(sample_model);
 
@@ -379,8 +379,7 @@ var modelList = [
                         name: "bear.obj", url: 'sample_models/bear-obj.obj'
                     },
                     {
-                        name: "car.obj", url: 'sample_models/car2.obj',
-                        objectRotation: new THREE.Euler(0, 3 * Math.PI / 2, 0)
+                        name: "car.obj", url: 'sample_models/car2.obj'
                     },
                     {
                         name: "tiger.obj", url: 'sample_models/Tiger.obj'
