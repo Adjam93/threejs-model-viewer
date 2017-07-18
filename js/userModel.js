@@ -19,7 +19,9 @@ function readFile(evt) {
             var tmppath = URL.createObjectURL(evt.target.files[0]); //Testing a temporary path for .obj file
 
             reader.onload = function (e) {
-                scene.remove(model); //on each load of .obj file remove current file from scene before adding new selected file
+                 //on each load of .obj file remove current file from scene before adding new selected file
+                //and uncheck any boxes
+                removeModel();
 
                 document.getElementById("scale_up").disabled = false;
                 document.getElementById("scale_down").disabled = false;
