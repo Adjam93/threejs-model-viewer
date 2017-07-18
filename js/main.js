@@ -206,6 +206,7 @@ function initScene(index) {
             var percentage = Math.round((data.loaded * 100) / data.total);
             console.log(percentage);
             statsNode.innerHTML = 'Loaded : ' + percentage + '%' + ' of ' + sceneInfo.name
+            + '<br>'
             + '<progress value="0" max="100" class="progress"></progress>';
             $('.progress').css({ 'width': percentage + '%' });
             $('.progress').val(percentage);
