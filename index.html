@@ -21,7 +21,7 @@
     <script src="js/THREEx.FullScreen.js"></script>
     <script src="js/jquery.nicescroll.js"></script>
     <script src="js/spectrum.js"></script>
-    
+
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 
     <link rel='stylesheet' href='css/main_style.css' />
@@ -224,7 +224,13 @@
                                 <span class="toggle round"></span>
                             </label>
                         </li>
-                        <li><button id="Rotate_X">Rotate X</button></li>
+                        <li>Fix Rotation of Imported Models</li>
+                        <li style="display:inline-block;">
+                            <button class="rotateButton" id="Rotate_X">Rotate X</button>
+                            <button class="rotateButton" id="Rotate_Y">Rotate Y</button>
+                            <button class="rotateButton" id="Rotate_Z">Rotate Z</button>
+                        </li>
+
                     </ul>
                 </li>
 
@@ -303,10 +309,10 @@
     </div>
 
     <script src="js/ColourTheme.js"></script>
-    
+
     <script>
         $(document).ready(function () {
-            $("html").niceScroll({ styler: "fb", cursorcolor: "#000"});
+            $("html").niceScroll({ styler: "fb", cursorcolor: "#000" });
             $("#stats").niceScroll();
         });
     </script>
