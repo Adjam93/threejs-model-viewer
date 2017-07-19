@@ -2,7 +2,6 @@
 <html>
 
 <head>
-
     <title>WebGL Model Viewer</title>
 
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -22,14 +21,7 @@
     <script src="js/THREEx.FullScreen.js"></script>
     <script src="js/jquery.nicescroll.js"></script>
     <script src="js/spectrum.js"></script>
-
-    <script>
-    $(document).ready(function () {
-        $("html").niceScroll({ styler: "fb", cursorcolor: "#000"});
-        $("#stats").niceScroll();
-    });
-    </script>
-
+    
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 
     <link rel='stylesheet' href='css/main_style.css' />
@@ -311,7 +303,13 @@
     </div>
 
     <script src="js/ColourTheme.js"></script>
+    
+    <script>
+        $(document).ready(function () {
+            $("html").niceScroll({ styler: "fb", cursorcolor: "#000"});
+            $("#stats").niceScroll();
+        });
+    </script>
 
 </body>
-
 </html>
