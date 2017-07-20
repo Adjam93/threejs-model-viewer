@@ -269,6 +269,7 @@ function removeModel() {
     scene.remove(model);
     scene.remove(glowModel); //Remove glow model if present
     materials.glowMaterial.visible = false;
+    scale = 1;
 
     camera.position.set(0, 0, 20); //Reset camera to initial position
     controls.reset(); //Reset controls, for when previous object has been moved around e.g. larger object = larger rotation
