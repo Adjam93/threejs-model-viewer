@@ -10,7 +10,7 @@ function setCamera(mod) {
 }
 
 function setGlowModel(mod) {
-    glowModel = new THREE.Mesh(mod.children[0].geometry, materials.glowMaterial);
+    glowModel = new THREE.Mesh(mod.children[0].geometry, materials.glowMaterial); //mod.children[0] - the first mesh found in object
     materials.glowMaterial.visible = false;
     glowModel.position = mod.position;
     glowModel.scale.multiplyScalar(1.025);
@@ -56,16 +56,22 @@ function setWireframeAndModel(mod) {
 
 function setPhong(mod) {
 
-    $('#phong_check').change(function () {
-        if (phong.checked) {
-            mod.material = materials.phongMaterial;
-        }
-        else {
-            mod.material = materials.default_material;
-        }
-    });
-}
+    //$('#phong_check').change(function () {
+    //    if (phong.checked) {
+    //        mod.material = materials.phongMaterial;
+    //    }
+    //    else {
+    //        mod.material = materials.default_material;
+    //    }
+    //});
 
+
+    $('#phong_check').change(function () {
+        phong.checked ? mod.material = materials.phongMaterial : mod.material = materials.default_material;
+    });
+
+}
+    
 
 function setXray(mod) {
 
@@ -141,7 +147,6 @@ $('#polar_grid').change(function () {
 function setGrid(mod) {
 
     var bbox2 = new THREE.Box3().setFromObject(mod);
-    console.log(bbox2.min.y);
 
     /*NORMAL GRID HELPER*/
     gridHelper = new THREE.GridHelper(bbox2.max.x * 4, 40, 0xe6e600, 0x808080);
@@ -165,7 +170,6 @@ $('#grid').change(function () {
 function setAxis(mod) {
 
     var bbox3 = new THREE.Box3().setFromObject(mod);
-    console.log(bbox3.min.y);
 
     /*AXIS HELPER*/
     axis_view = new THREE.AxisHelper(bbox3.max.z * 10); //Set axis size based on the non visible box3() size.
@@ -221,10 +225,8 @@ function scaleUp(mod) {
 
     $('#scale_up').click(function (e) {
         if (modelLoaded || sample_model_loaded) {
-            scale = scale + (scale * 0.55);
+            scale = scale + (scale * 0.15);
             mod.scale.x = mod.scale.y = mod.scale.z = scale;
-            camera.lookAt(mod.position);
-            controls.reset();
         }
     });
 }
@@ -233,10 +235,8 @@ function scaleDown(mod) {
 
     $('#scale_down').click(function (e) {
         if (modelLoaded || sample_model_loaded) {
-            scale = scale - (scale * 0.25);
+            scale = scale - (scale * 0.15);
             mod.scale.x = mod.scale.y = mod.scale.z = scale;
-            camera.lookAt(mod.position);
-            controls.reset();
         }
     });  
 }
