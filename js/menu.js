@@ -31,7 +31,6 @@ $(document).ready(function () {
             // open new menu and add the open class
             $(this).next("ul").slideDown(350);
             $(this).addClass("active");
-            $("#bottom_menu").niceScroll();
 
         } else if ($(this).hasClass("active")) {
 
