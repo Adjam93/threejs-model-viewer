@@ -2,6 +2,7 @@
 <html>
 
 <head>
+
     <title>WebGL Model Viewer</title>
 
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -21,6 +22,7 @@
     <script src="js/THREEx.FullScreen.js"></script>
     <script src="js/jquery.nicescroll.js"></script>
     <script src="js/spectrum.js"></script>
+    <script src="js/jszip.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 
@@ -84,7 +86,7 @@
                         <li><span>Ambient Light</span></li>
                         <li>
                             <label class="switch">
-                                <input type="checkbox" id="ambient_light">
+                                <input class="check" type="checkbox" id="ambient_light">
                                 <span class="toggle round"></span>
                             </label>
                         </li>
@@ -115,14 +117,14 @@
                         <li><span>Wireframe</span></li>
                         <li>
                             <label class="switch">
-                                <input type="checkbox" id="wire_check">
+                                <input class="check" type="checkbox" id="wire_check">
                                 <span class="toggle round"></span>
                             </label>
                         </li>
                         <li><span>Model + Wireframe</span></li>
                         <li>
                             <label class="switch">
-                                <input type="checkbox" id="model_wire">
+                                <input class="check" type="checkbox" id="model_wire">
                                 <span class="toggle round"></span>
                             </label>
                         </li>
@@ -136,7 +138,7 @@
 
                         <li>
                             <label class="switch">
-                                <input type="checkbox" id="phong_check">
+                                <input class="check" type="checkbox" id="phong_check">
                                 <span class="toggle round"></span>
                             </label>
                         </li>
@@ -152,7 +154,7 @@
                         <li> <span>X-Ray </span></li>
                         <li>
                             <label class="switch">
-                                <input type="checkbox" id="xray_check">
+                                <input class="check" type="checkbox" id="xray_check">
                                 <span class="toggle round"></span>
                             </label>
                         </li>
@@ -165,7 +167,7 @@
                         <li> <span>Glow</span></li>
                         <li>
                             <label class="switch">
-                                <input type="checkbox" id="glow_check">
+                                <input class="check" type="checkbox" id="glow_check">
                                 <span class="toggle round"></span>
                             </label>
                         </li>
@@ -213,7 +215,7 @@
                 <li class='dropdown'>
                     <a href='#'><img src="images/rotation.png" class="image" />Model Rotation</a>
                     <ul>
-                        <li style="display:inline-block;  margin:0 35px 0 0;"><span>Apply Rotation </span></li>
+                        <li style="display:inline-block;  margin:0 35px 0 0;"><span>Apply Rotation</span></li>
                         <li style="display:inline-block">
                             <span>Set Rotation Speed</span>
                             <span id="rot_slider"></span>
@@ -224,13 +226,13 @@
                                 <span class="toggle round"></span>
                             </label>
                         </li>
-                        <li>Fix Rotation of Imported Models</li>
+                        <li>Fix Rotation of Imported Models<hr style="margin-top:0px" /></li>
                         <li style="display:inline-block;">
                             <button class="rotateButton" id="Rotate_X">Rotate X</button>
                             <button class="rotateButton" id="Rotate_Y">Rotate Y</button>
-                            <button class="rotateButton" id="Rotate_Z">Rotate Z</button>
+                            <button class="rotateButton" id="Rotate_Z">Rotate Z</button>                           
                         </li>
-
+                        <li><button class="resetRotateButton" id="reset_rot">Reset</button></li>
                     </ul>
                 </li>
 
@@ -248,31 +250,31 @@
                     <a href='#'><img src="images/grid.png" class="image" />Model View Helpers</a>
                     <ul style="font-size: 13.5px">
                         <li style="display:inline-block; margin:0 25px 0 0;">
-                            <span>Grid</span>
-                            <label class="switch">
+                            <span style="font-size:18px">Grid</span>
+                            <label class="switch helper">
                                 <input type="checkbox" id="grid">
-                                <span class="toggle round"></span>
+                                <span class="toggle grid round"></span>
                             </label>
                         </li>
                         <li style="display:inline-block; margin:0 25px 0 0;">
-                            <span>Polar Grid</span>
-                            <label class="switch">
+                            <span style="font-size:18px">Polar-grid</span>
+                            <label class="switch helper">
                                 <input type="checkbox" id="polar_grid">
-                                <span class="toggle round"></span>
+                                <span class="toggle grid round"></span>
                             </label>
                         </li>
                         <li style="display:inline-block; margin:0 25px 0 0;">
-                            <span>Axis</span>
-                            <label class="switch">
+                            <span style="font-size:18px">Axis</span>
+                            <label class="switch helper">
                                 <input type="checkbox" id="axis">
-                                <span class="toggle round"></span>
+                                <span class="toggle grid round"></span>
                             </label>
                         </li>
                         <li style="display:inline-block; margin:0 25px 0 0;">
-                            <span>Model Box</span>
-                            <label class="switch">
+                            <span style="font-size:18px">Model Box</span>
+                            <label class="switch helper">
                                 <input type="checkbox" id="bBox">
-                                <span class="toggle round"></span>
+                                <span class="toggle grid round"></span>
                             </label>
                         </li>
                     </ul>
@@ -318,4 +320,5 @@
     </script>
 
 </body>
+
 </html>
