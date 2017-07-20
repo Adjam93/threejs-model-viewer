@@ -72,13 +72,34 @@ function readFile(evt) {
 
                 console.log(renderer.info.memory.geometries);
 
-                /*Some models may load in with incorrect rotation on X axis*/
+                   /*Some models may load in with incorrect rotation on X axis*/
                 $("#Rotate_X").click(function () {
 
                     model.rotation.x = -Math.PI / 2;
                     polar_grid_helper.rotation.x = Math.PI / 2;
                     gridHelper.rotation.x = Math.PI / 2;
                     axis_view.rotation.x = Math.PI / 2;
+                });
+
+                $("#Rotate_Y").click(function () {
+                    model.rotation.y = -Math.PI / 2;
+                    polar_grid_helper.rotation.y = Math.PI / 2;
+                    gridHelper.rotation.y = Math.PI / 2;
+                    axis_view.rotation.y = Math.PI / 2;
+                });
+
+                $("#Rotate_Z").click(function () {
+                    model.rotation.z = -Math.PI / 2;
+                    polar_grid_helper.rotation.z = Math.PI / 2;
+                    gridHelper.rotation.z = Math.PI / 2;
+                    axis_view.rotation.z = Math.PI / 2;
+                });
+
+                $("#reset_rot").click(function () {
+                    model.rotation.set(0, 0, 0);
+                    polar_grid_helper.rotation.set(0, 0, 0);
+                    gridHelper.rotation.set(0, 0, 0);
+                    axis_view.rotation.set(0, 0, 0);
                 });
 
                 scene.add(model);
