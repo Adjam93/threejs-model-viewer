@@ -1,7 +1,8 @@
- body {
-        font-family: Helvetica, FreeSans, Arial, sans-serif;
-        font-size: 10px;
-        background-color: #292121; /*565646*/
+ body 
+        {
+            font-family: Helvetica, FreeSans, Arial, sans-serif;
+            font-size: 10px;
+            background-color: #292121; /*565646*/
         }
 
         #stats {
@@ -96,6 +97,15 @@
           height: 34px;
         }
 
+        .switch.helper {
+          position: relative;
+          display: inline-block;
+          width: 55px;
+          height: 24px;
+          margin-left:10px;
+        }
+
+
         .switch input {display:none;} /*hide default checkbox*/
 
         .toggle {
@@ -124,6 +134,11 @@
           border-radius: 50%;
         }
 
+        .grid:before {
+          height: 16px;
+          width: 16px;
+        }
+
         .toggle:after {
             content:'OFF';
             color: white;
@@ -132,9 +147,11 @@
             transform: translate(-50%,-50%);
             top: 50%;
             left: 70%;
-            font-size: 8px;
+            font-size: 12px;
             font-family: Verdana, sans-serif;
         }
+
+
 
         input:checked + .toggle:after {  
           content:'ON';
@@ -150,9 +167,15 @@
         }
 
         input:checked + .toggle:before {
-          -webkit-transform: translateX(26px);
-          -ms-transform: translateX(26px);
+          -webkit-transform: translateX(55px);
+          -ms-transform: translateX(55px);
           transform: translateX(55px);
+        }
+
+         input:checked + .grid:before {
+          -webkit-transform: translateX(30px);
+          -ms-transform: translateX(30px);
+          transform: translateX(30px);
         }
 
 
@@ -263,7 +286,7 @@
             width: 30%;
         }
 
-        .rotateButton {
+        .rotateButton, .resetRotateButton {
 	        -moz-box-shadow:inset 0px 1px 0px 0px #030100;
 	        -webkit-box-shadow:inset 0px 1px 0px 0px #030100;
 	        box-shadow:inset 0px 1px 0px 0px #030100;
@@ -284,6 +307,16 @@
         }
         .rotateButton:hover {
 	        background-color:#239450;
+        }
+
+         .resetRotateButton {
+	       background-color: #DD3D0C;
+           margin-top: 5px;
+           width: 97%;
+           font-size:15px;
+        }
+        .resetRotateButton:hover {
+	        background-color: #B43008;
         }
 
         #scale_up, #scale_down
