@@ -166,7 +166,7 @@ $('#grid').change(function () {
     }
 });
 
-
+var axis_view;
 function setAxis(mod) {
 
     var bbox3 = new THREE.Box3().setFromObject(mod);
@@ -178,7 +178,6 @@ function setAxis(mod) {
     mod.add(axis_view);
 }
 
-var axis_view;
 $('#axis').change(function () {
     if (axis.checked) {
         axis_view.visible = true;
@@ -219,24 +218,66 @@ $(".glow_select").spectrum({
 });
 
 /*SCALE FUNCTIONS*/
-var scale = 1;
+var loopScale = 0;
+scale = 1;
 
 function scaleUp(mod) {
 
+   // User clicks scale button once at a time, scale applied once
     $('#scale_up').click(function (e) {
         if (modelLoaded || sample_model_loaded) {
-            scale = scale + (scale * 0.15);
-            mod.scale.x = mod.scale.y = mod.scale.z = scale;
+
+            if (mod.scale.z < 25) {
+
+                scale += (scale * 0.45);
+                mod.scale.x = mod.scale.y = mod.scale.z = scale;
+                console.log(mod.scale.z);
+            }         
         }
     });
 }
 
 function scaleDown(mod) {
 
+    //User clicks scale button once at a time, scale applied once
     $('#scale_down').click(function (e) {
         if (modelLoaded || sample_model_loaded) {
-            scale = scale - (scale * 0.15);
+
+            scale -= (scale * 0.35);
             mod.scale.x = mod.scale.y = mod.scale.z = scale;
+            console.log(mod.scale.z);
         }
-    });  
+    });
+}
+
+function fixRotation(mod) {
+
+    $("input:radio[name=rotate]").click(function () {
+        var rotAxis = $("input:radio[name=rotate]:checked").val();
+
+        switch (rotAxis) {
+
+            case 'rotateX':
+                mod.rotation.x = -Math.PI / 2;
+                polar_grid_helper.rotation.x = Math.PI / 2;
+                gridHelper.rotation.x = Math.PI / 2;
+                axis_view.rotation.x = Math.PI / 2;
+                break;
+
+            case 'rotateY':
+                mod.rotation.y = -Math.PI / 2;
+                polar_grid_helper.rotation.y = Math.PI / 2;
+                gridHelper.rotation.y = Math.PI / 2;
+                axis_view.rotation.y = Math.PI / 2;
+                break;
+
+            case 'rotateZ':
+                mod.rotation.z = -Math.PI / 2;
+                polar_grid_helper.rotation.z = Math.PI / 2;
+                gridHelper.rotation.z = Math.PI / 2;
+                axis_view.rotation.z = Math.PI / 2;
+                break;
+        }
+
+    });
 }
