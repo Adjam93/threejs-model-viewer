@@ -1,28 +1,38 @@
+
 <!DOCTYPE html>
 <html>
 
 <head>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>WebGL Model Viewer</title>
+    
+    <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
 
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
-    <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
-    <link rel="shortcut icon" href="favicon.ico">
-
     <link rel='stylesheet' href='css/spectrum.css' />
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!--Three.js scripts-->
     <script src="js/three.js"></script>
-    <script src="js/MTLLoader.js"></script>
+    <script src="js/CanvasRenderer.js"></script>
+    <script src="js/Projector.js"></script>
+    <script src="js/Detector.js"></script>
+
     <script src="js/OBJLoader.js"></script>
     <script src="js/DDSLoader.js"></script>
+
     <script src="js/OrbitControls.js"></script>
+
     <script src="js/THREEx.FullScreen.js"></script>
+    <script src="js/THREEx.WindowResize.js"></script>
+
     <script src="js/jquery.nicescroll.js"></script>
     <script src="js/spectrum.js"></script>
-    <script src="js/jszip.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 
@@ -59,6 +69,21 @@
            gl_FragColor = vec4( glow, 1.0 );
         }
     </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#load_help').dialog({
+                autoOpen: false,
+                width: 567
+            }).css("font-size", "16px");
+
+            $('.qBtn').click(function () {
+                $('#load_help').dialog('open');
+            });
+        });
+    </script>
+
+
 </head>
 
 <body>
@@ -70,7 +95,7 @@
         <div class="side_menu">
             <ul class="menu_item">
 
-                <li id="header">
+                <!--<li id="header">
                     <table style="width:100%">
                         <tr>
                             <th style="font-size: 15px;">Viewer Options</th>
@@ -78,7 +103,7 @@
                             <th style="font-size: 11px;"><button id="darkSkin">Dark</button></th>
                         </tr>
                     </table>
-                </li>
+                </li>-->
 
                 <li class='dropdown'>
                     <a href='#'><img src="images/ambient_icon.png" class="image" />Ambient Light</a>
@@ -190,22 +215,37 @@
                 </li>
 
                 <li class='dropdown'>
-                    <a href='#'><img src="images/folder_icon.png" class="image" />Select .obj File</a>
+                    <a href='#'><img src="images/folder_icon.png" class="image" />Select/Drop Model File</a>
                     <ul>
-                        <li>.obj File</li>
-                        <li><input type="file" id="obj_file" /></li>
-                        <li>.mtl File</li>
-                        <li><input type="file" id="mtl_file" /></li>
-                        <li>Remove File</li>
-                        <li><button type="button" id="remove">Remove file</button></li>
-                        <li>Image Files</li>
-                        <li><input type="file" id="images" multiple="multiple" accept="image/*" /></li>
-                        <li><output id="result" /></li>
+                        <li style="background:#d9d9f2; color:black; text-align:center">Select from button or drag and drop model onto the viewer</li>
+
+
+                        <li style="margin-top: 12px; margin-bottom: 16px;">
+                             <label for="obj_file" class="model-upload">
+                                 <i style="margin-right: 5px;" class="fa fa-upload"></i> Load Model 
+                            </label>
+                            <button class="qBtn" id="q_btn" title="Model Loading Help"><i class="fa fa-question-circle q_mark"></i></button>
+                        </li>                  
+                        <li><input onclick="this.value=null;" type="file" id="obj_file" /></li>
+                        <!-- onclick value = null to fix for when a user clicks remove model,
+                            they can click load model and reload the same model, as this was returning
+                            blank before -->
+
+                        <li><button type="button" id="remove"><i style="margin-right: 5px;" class="fa fa-trash"></i> Remove file</button></li>
+
                     </ul>
                 </li>
             </ul>
 
-            <div id="disp_tmp_path"></div>
+            <div id="load_help" title="Loading Models">
+                <p>Locate the model file you wish to view. Textures/associated images of the model
+                   are not currently supported, so only select the model file.</p>
+                <h4>Supported File Types</h4>
+                <ul>
+                    <li>.obj</li>
+                </ul>
+            </div>
+
         </div>
         <!--Side Menu End-->
 
@@ -227,12 +267,23 @@
                             </label>
                         </li>
                         <li>Fix Rotation of Imported Models<hr style="margin-top:0px" /></li>
-                        <li style="display:inline-block;">
-                            <button class="rotateButton" id="Rotate_X">Rotate X</button>
-                            <button class="rotateButton" id="Rotate_Y">Rotate Y</button>
-                            <button class="rotateButton" id="Rotate_Z">Rotate Z</button>                           
+                        <li>
+                            <div id="rotation">
+                                <div class="radioBtn">
+                                    <input type="radio" id="r1"name="rotate" value="rotateX"> Rotate X
+                                </div>  
+                                        
+                                <div class="radioBtn">
+                                    <input type="radio" id="r2" name="rotate" value="rotateY"> Rotate Y
+                                </div>  
+
+                                <div class="radioBtn">
+                                    <input type="radio" id="r3" name="rotate" value="rotateZ"> Rotate Z
+                                </div>                             
+                            </div>
                         </li>
-                        <li><button class="resetRotateButton" id="reset_rot">Reset</button></li>
+
+                        <li><button class="resetRotateButton" type='reset' id="reset_rot">Reset</button></li>                       
                     </ul>
                 </li>
 
@@ -310,12 +361,12 @@
         <script src="js/userModel.js"></script>
     </div>
 
-    <script src="js/ColourTheme.js"></script>
+    <!--<script src="js/ColourTheme.js"></script>-->
 
     <script>
         $(document).ready(function () {
             $("html").niceScroll({ styler: "fb", cursorcolor: "#000" });
-            $("#stats").niceScroll();
+            $("#stats").niceScroll({ horizrailenabled: false });
         });
     </script>
 
