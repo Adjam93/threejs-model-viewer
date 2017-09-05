@@ -1,7 +1,8 @@
 var view = document.getElementById('main_viewer');
+if (!Detector.webgl) Detector.addGetWebGLMessage();
 
 var camera, camerHelper, scene, renderer, loader,
-    stats, controls, model, sample_model, glowModel, delta;
+    stats, controls, model, sample_model, glowModel, scale, delta;
 
 var modelLoaded = false;
 var bg_Texture = false;
@@ -78,25 +79,23 @@ function initScene(index) {
     camera.position.set(0, 0, 20);
 
     //Setup renderer
-    renderer = new THREE.WebGLRenderer({ alpha: true });
+    //renderer = new THREE.CanvasRenderer({ alpha: true });
+    //renderer = Detector.webgl? new THREE.WebGLRenderer(): new THREE.CanvasRenderer();
+    renderer = new THREE.WebGLRenderer({ alpha: true });  
     renderer.setSize(winDims[0], winDims[1]);
     renderer.setClearColor(0x292121); //565646, 292121
 
     view.appendChild(renderer.domElement);
 
+    THREEx.WindowResize(renderer, camera);
+
     function toggleFullscreen(elem) {
         elem = elem || document.documentElement;
         if (!document.fullscreenElement && !document.mozFullScreenElement &&
             !document.webkitFullscreenElement && !document.msFullscreenElement) {
-            THREEx.FullScreen.request(container);
-            renderer.setSize(screen.width, screen.height); //Fullscreen renderer (for chrome)
-            view.style.marginLeft = "261px"; //Move div containing WebGL renderer to the right
-            //in fullscreen mode, so that the object appears in
-            //same location and not shifted to the left.
-            //ONLY WORKING IN CHROME FOR NOW
 
-            // controls.reset();
-            //camera.updateProjectionMatrix();
+            THREEx.FullScreen.request(container);
+
         }
         else {
             if (document.exitFullscreen) {
@@ -245,7 +244,7 @@ function initScene(index) {
             }
         });
 
-        /*if (sceneInfo.objectRotation) {
+       /*if (sceneInfo.objectRotation) {
             sample_model.rotation.copy(sceneInfo.objectRotation);
         }*/
        
@@ -287,6 +286,8 @@ function removeModel() {
     });
     controls.autoRotate = false; //Stop model auto rotating if doing so on new file select
     $('#shine').slider("value", 10); //Set phong shine level back to initial
+
+    $('input[name="rotate"]').prop('checked', false); //uncheck rotate x, y or z checkboxes
 }
 
 $('#remove').click(function () {
