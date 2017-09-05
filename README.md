@@ -3,7 +3,7 @@ An application using the Three.js library to allow user to load .obj files and v
 
 <b>Features:</b>
 - View sample models from dropdown list
-- Load .obj file into the 3D scene
+- Load/Drop file into the 3D scene
 - View model information (name of model, number of vertices and faces)
 - Add ambient light and alter the colour
 - Alter the colour of the directional Ligt
@@ -15,5 +15,11 @@ An application using the Three.js library to allow user to load .obj files and v
 - Auto-rotate the model and adjust the rotation speed
 - Scale the model up and down
 - Add view helpers such as bounding box, square/circular grid underneath model and an axis
+
+<b>Potential Features:</b>
+- Make menus collapsible
+- Load more formats e.g. Collada, STL, GLTF, etc.
+- Allow user to load model with .mtl (material) file and images
+- ZIP file support
 
 <h2><a href="http://adjam.heliohost.org/3d-viewer" target="_blank">DEMO</a></h2>
