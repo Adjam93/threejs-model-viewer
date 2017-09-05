@@ -1,36 +1,59 @@
-/*READ FILE*/
-document.getElementById('obj_file').addEventListener('change', readFile, false); //Read .obj file
+//Read file from input button
+var model_file = document.getElementById('obj_file');
 
-var fileType = ['obj'];
-var reader;
+model_file.addEventListener('change', function (event) {
 
-function readFile(evt) {
-    if (evt.target.files && evt.target.files[0]) {
-        var extension = evt.target.files[0].name.split('.').pop().toLowerCase(), //get .obj file extension from input file
-            isSuccess = fileType.indexOf(extension) > -1;  //is extension acceptable type
+    var file = event.target.files[0];
+    loadFile(file);
 
-        if (isSuccess) {
-            scene.remove(sample_model);
+}); 
 
-            modelLoaded = true;
-            var fileObject = evt.target.files[0];
-            reader = new FileReader();
+//Drag and drop files anywhere onto the viewer
+document.addEventListener('dragover', function (event) {
 
-            var tmppath = URL.createObjectURL(evt.target.files[0]); //Testing a temporary path for .obj file
+    event.stopPropagation();
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
 
-            reader.onload = function (e) {
-                 //on each load of .obj file remove current file from scene before adding new selected file
-                //and uncheck any boxes
+}, false);
+
+document.addEventListener('drop', function (event) {
+    
+    event.stopPropagation(); //Only call loadFile function on drop event (default is to display file as plain text file).
+    event.preventDefault();
+
+    if (event.dataTransfer.files.length > 0) {
+
+        loadFile(event.dataTransfer.files[0]);
+    }
+
+}, false);
+
+
+var loadFile = function ( file ) {
+
+    var filename = file.name;
+    var extension = filename.split( '.' ).pop().toLowerCase();
+
+    var reader = new FileReader();
+      
+    switch ( extension ) {
+
+        case 'obj':
+
+                //When file type matches case - remove sample model or remove previously loaded model from user file
+                scene.remove(sample_model);
                 removeModel();
+                modelLoaded = true;
+                
+                reader.addEventListener( 'load', function ( event ) {
+
+                var contents = event.target.result;
+
+                model = loader.parse(contents);
 
                 document.getElementById("scale_up").disabled = false;
                 document.getElementById("scale_down").disabled = false;
-
-                loader.setPath(tmppath)
-                console.log(tmppath);
-
-                model = loader.parse(this.result); //Set model to be the user file
-                $("#disp_tmp_path").html("Temporary Path --> <strong>[" + tmppath + "]</strong>"); //Display temp path
 
                 var geometry;
                 model.traverse(function (child) {
@@ -39,21 +62,21 @@ function readFile(evt) {
 
                         if (geometry !== undefined) {
                             //Dislay file name, number of vertices and faces info of model
-                            statsNode.innerHTML = 'Name of model/file: ' + fileObject.name
+                            statsNode.innerHTML = 'Name of model/file: ' + filename
                                 + '<br>'
                                 + 'Number of vertices: ' + geometry.vertices.length
                                 + '<br>'
                                 + 'Number of faces: ' + geometry.faces.length;
                         }
 
-                        child.material = materials.default_material;            
+                        child.material = materials.default_material;
 
                         setWireFrame(child);
                         setWireframeAndModel(model);
                         setGlowModel(model);
                         setGlow(child);
                         setPhong(child);
-                        setXray(child);                      
+                        setXray(child);
 
                     }
                 });
@@ -72,58 +95,48 @@ function readFile(evt) {
 
                 console.log(renderer.info.memory.geometries);
 
-                   /*Some models may load in with incorrect rotation on X axis*/
-                $("#Rotate_X").click(function () {
+                //Some models may load in with incorrect rotation on X axis
+                fixRotation(model);
 
-                    model.rotation.x = -Math.PI / 2;
-                    polar_grid_helper.rotation.x = Math.PI / 2;
-                    gridHelper.rotation.x = Math.PI / 2;
-                    axis_view.rotation.x = Math.PI / 2;
-                });
-
-                $("#Rotate_Y").click(function () {
-                    model.rotation.y = -Math.PI / 2;
-                    polar_grid_helper.rotation.y = Math.PI / 2;
-                    gridHelper.rotation.y = Math.PI / 2;
-                    axis_view.rotation.y = Math.PI / 2;
-                });
-
-                $("#Rotate_Z").click(function () {
-                    model.rotation.z = -Math.PI / 2;
-                    polar_grid_helper.rotation.z = Math.PI / 2;
-                    gridHelper.rotation.z = Math.PI / 2;
-                    axis_view.rotation.z = Math.PI / 2;
-                });
-
+                //Reset only runs when user model is loaded, as sample models all have correct orientation
                 $("#reset_rot").click(function () {
                     model.rotation.set(0, 0, 0);
                     polar_grid_helper.rotation.set(0, 0, 0);
                     gridHelper.rotation.set(0, 0, 0);
                     axis_view.rotation.set(0, 0, 0);
+                    $('input[name="rotate"]').prop('checked', false);
                 });
 
                 scene.add(model);
-            };
-            reader.readAsText(fileObject);
-        }
-        else { //File other than .obj type selected
-            alert("Wrong file type, please select .obj files only");
-        }
 
-        var size = document.getElementById('obj_file').files[0].size;
+            }, false );
+            reader.readAsText( file );
 
-        //progress/loading bar
-        reader.onprogress = function (data) {
-            if (data.lengthComputable) { //if size of file transfer is known
-                var percentage = Math.round((data.loaded * 100) / data.total);
-                console.log(percentage);
-                statsNode.innerHTML = 'Loaded : ' + percentage + '%' + ' of ' + fileObject.name
-                + '<br>'
-                + '<progress value="0" max="100" class="progress"></progress>';
-                // + 'Size of file ' + Math.round(size / 1048576) + 'Mbs';
-                $('.progress').css({ 'width': percentage + '%' });////Width of progress bar set to the current percentage of model loaded (progress bar therefore increases in width as model loads)
-                $('.progress').val(percentage); //Set progress bar value to the current amount loaded
-            }
-        }
+            break;
+
+
+            //ADD MORE FILE TYPE CASES HERE E.G. STL, COLLADA
+
+        default:
+
+            alert( 'Unsupported file format (' + extension +  ').' );
+
+            break;
     }
-}
+
+    reader.addEventListener('progress', function (data) {
+
+        if (data.lengthComputable) { //if size of file transfer is known
+            var percentage = Math.round((data.loaded * 100) / data.total);
+            console.log(percentage);
+            statsNode.innerHTML = 'Loaded : ' + percentage + '%' + ' of ' + filename
+            + '<br>'
+            //+ 'Size of file ' + Math.round(size / 1048576) + 'Mbs'
+            //+ '<br>'
+            + '<progress value="0" max="100" class="progress"></progress>';
+            $('.progress').css({ 'width': percentage + '%' });////Width of progress bar set to the current percentage of model loaded (progress bar therefore increases in width as model loads)
+            $('.progress').val(percentage); //Set progress bar value to the current amount loaded
+        }
+
+    });
+};
