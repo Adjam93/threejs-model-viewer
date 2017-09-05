@@ -11,7 +11,7 @@ $(document).ready(function () {
             // open new menu and add the open class
             $(this).next("ul").slideDown(350);
             $(this).addClass("active");
-            $(".side_menu").niceScroll({ horizrailenabled: false }); //add jquery nicescroll with horizontal scroll disabled
+            //$(".side_menu").niceScroll({ horizrailenabled: false }); //add jquery nicescroll with horizontal scroll disabled
             
         } else if ($(this).hasClass("active")) {
 
