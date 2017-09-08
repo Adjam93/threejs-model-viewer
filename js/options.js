@@ -10,19 +10,43 @@ function setCamera(mod) {
 }
 
 function setGlowModel(mod) {
+
+    //This function only works for the sample models - as the first mesh found provides the outline mesh for glow effect
     glowModel = new THREE.Mesh(mod.children[0].geometry, materials.glowMaterial); //mod.children[0] - the first mesh found in object
     materials.glowMaterial.visible = false;
     glowModel.position = mod.position;
     glowModel.scale.multiplyScalar(1.025);
     mod.add(glowModel);
+
+}
+
+function setGlow(mod) {
+
+    $('#glow_check').on('change', function () {
+        if (glow.checked) {
+
+            $('input.check').not(this).prop('checked', false);
+            materials.glowMaterial.visible = true;
+            glowModel.visible = true; //STL models - glowModel mesh is set to visible = false initially
+        }
+        else {
+            materials.glowMaterial.visible = false;
+           // glowModel.visible = false;
+            //scene.remove(glowModel);
+            mod.material = materials.default_material;
+        }
+    });
 }
 
 function setWireFrame(mod) {
 
-    $('#wire_check').change(function () {
+    $('#wire_check').on('change', function () {
+
+        $('input.check').not(this).prop('checked', false);
+
         if (wire.checked) {
+            materials.wireframeAndModel.visible = false;
             mod.material = materials.wireframeMaterial;
-            model_wire.checked = false;
         }
         else {
             mod.material = materials.default_material;
@@ -32,73 +56,44 @@ function setWireFrame(mod) {
 
 function setWireframeAndModel(mod) {
 
-    mod.traverse(function (child) {
-        if (child instanceof THREE.Mesh) {
+    $('#model_wire').on('change', function () {
 
-            var geo = new THREE.EdgesGeometry(child.geometry); // or WireframeGeometry
-            var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
-            var wireframe = new THREE.LineSegments(geo, mat);
+        $('input.check').not(this).prop('checked', false);
+        mod.material = materials.default_material;
 
-            $('#model_wire').change(function () {
-                if (model_wire.checked) {
-                    wire.checked = false;
-                    mod.material = materials.default_material;
-                    mod.add(wireframe);
-                }
-                else {
-                    mod.material = materials.default_material;
-                    mod.remove(wireframe);
-                }
-            });
+        if (model_wire.checked) {
+            materials.wireframeAndModel.visible = true;
+        }
+        else {
+            materials.wireframeAndModel.visible = false;
+            mod.material = materials.default_material;
         }
     });
+
 }
 
 function setPhong(mod) {
 
-    //$('#phong_check').change(function () {
-    //    if (phong.checked) {
-    //        mod.material = materials.phongMaterial;
-    //    }
-    //    else {
-    //        mod.material = materials.default_material;
-    //    }
-    //});
+    $('#phong_check').on('change', function () {
 
+        $('input.check').not(this).prop('checked', false);
 
-    $('#phong_check').change(function () {
         phong.checked ? mod.material = materials.phongMaterial : mod.material = materials.default_material;
     });
 
 }
-    
 
 function setXray(mod) {
 
-    $('#xray_check').change(function () {
-        if (xray.checked) {
-            mod.material = materials.xrayMaterial;
-        }
-        else {
-            mod.material = materials.default_material;
-        }
-    });
+    $('#xray_check').on('change', function () {
 
-}
+        $('input.check').not(this).prop('checked', false);
 
-function setGlow(mod) {
-
-    $('#glow_check').change(function () {
-        if (glow.checked) {
-            materials.glowMaterial.visible = true;
-        }
-        else {
-            materials.glowMaterial.visible = false;
-            scene.remove(glowModel);
-            mod.material = materials.default_material;
-        }
+        xray.checked ? (mod.material = materials.xrayMaterial, materials.glowMaterial.visible = false) : mod.material = materials.default_material;
+      
     });
 }
+
 
 var bound_box;
 function setBoundBox(mod) {
@@ -231,7 +226,7 @@ function scaleUp(mod) {
 
                 scale += (scale * 0.45);
                 mod.scale.x = mod.scale.y = mod.scale.z = scale;
-                console.log(mod.scale.z);
+                //console.log(mod.scale.z);
             }         
         }
     });
@@ -245,7 +240,7 @@ function scaleDown(mod) {
 
             scale -= (scale * 0.35);
             mod.scale.x = mod.scale.y = mod.scale.z = scale;
-            console.log(mod.scale.z);
+            //console.log(mod.scale.z);
         }
     });
 }
