@@ -5,13 +5,13 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>WebGL Model Viewer</title>
-    
-    <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
-    <link rel="shortcut icon" href="favicon.ico">
 
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico">
 
     <link rel='stylesheet' href='css/spectrum.css' />
 
@@ -24,6 +24,7 @@
     <script src="js/Detector.js"></script>
 
     <script src="js/OBJLoader.js"></script>
+    <script src="js/STLLoader.js"></script>
     <script src="js/DDSLoader.js"></script>
 
     <script src="js/OrbitControls.js"></script>
@@ -74,7 +75,7 @@
         $(document).ready(function () {
             $('#load_help').dialog({
                 autoOpen: false,
-                width: 567
+                width: 667
             }).css("font-size", "16px");
 
             $('.qBtn').click(function () {
@@ -94,16 +95,6 @@
         <!--Side Menu Start-->
         <div class="side_menu">
             <ul class="menu_item">
-
-                <!--<li id="header">
-                    <table style="width:100%">
-                        <tr>
-                            <th style="font-size: 15px;">Viewer Options</th>
-                            <th style="font-size: 11px;"><button id="lightSkin">Light</button></th>
-                            <th style="font-size: 11px;"><button id="darkSkin">Dark</button></th>
-                        </tr>
-                    </table>
-                </li>-->
 
                 <li class='dropdown'>
                     <a href='#'><img src="images/ambient_icon.png" class="image" />Ambient Light</a>
@@ -142,14 +133,14 @@
                         <li><span>Wireframe</span></li>
                         <li>
                             <label class="switch">
-                                <input class="check" type="checkbox" id="wire_check">
+                                <input class="check" type="checkbox" name="mod_mat" id="wire_check">
                                 <span class="toggle round"></span>
                             </label>
                         </li>
                         <li><span>Model + Wireframe</span></li>
                         <li>
                             <label class="switch">
-                                <input class="check" type="checkbox" id="model_wire">
+                                <input class="check" type="checkbox" name="mod_mat" id="model_wire">
                                 <span class="toggle round"></span>
                             </label>
                         </li>
@@ -163,7 +154,7 @@
 
                         <li>
                             <label class="switch">
-                                <input class="check" type="checkbox" id="phong_check">
+                                <input class="check" type="checkbox" name="mod_phong" id="phong_check">
                                 <span class="toggle round"></span>
                             </label>
                         </li>
@@ -179,7 +170,7 @@
                         <li> <span>X-Ray </span></li>
                         <li>
                             <label class="switch">
-                                <input class="check" type="checkbox" id="xray_check">
+                                <input class="check" type="checkbox" name="mod_xray" id="xray_check">
                                 <span class="toggle round"></span>
                             </label>
                         </li>
@@ -192,7 +183,7 @@
                         <li> <span>Glow</span></li>
                         <li>
                             <label class="switch">
-                                <input class="check" type="checkbox" id="glow_check">
+                                <input class="check" type="checkbox" name="mod_mat" id="glow_check">
                                 <span class="toggle round"></span>
                             </label>
                         </li>
@@ -217,8 +208,7 @@
                 <li class='dropdown'>
                     <a href='#'><img src="images/folder_icon.png" class="image" />Select/Drop Model File</a>
                     <ul>
-                        <li style="background:#d9d9f2; color:black; text-align:center">Select from button or drag and drop model onto the viewer</li>
-
+                        <li style="background: #d9d9f2; color: black; text-align: center">Select from button or drag and drop model onto the viewer</li>
 
                         <li style="margin-top: 12px; margin-bottom: 16px;">
                              <label for="obj_file" class="model-upload">
@@ -232,20 +222,36 @@
                             blank before -->
 
                         <li><button type="button" id="remove"><i style="margin-right: 5px;" class="fa fa-trash"></i> Remove file</button></li>
-
                     </ul>
                 </li>
             </ul>
 
             <div id="load_help" title="Loading Models">
-                <p>Locate the model file you wish to view. Textures/associated images of the model
-                   are not currently supported, so only select the model file.</p>
+               <p>Locate the model file you wish to view. Textures/associated images of the model
+                   are not currently supported, so only select the model file.
+                </p>
                 <h4>Supported File Types</h4>
                 <ul>
                     <li>.obj</li>
+                    <li>.stl</li>
                 </ul>
+                <p>
+                    <h4>Model Sizes</h4>
+                    <hr />
+                    Some Models may be out of view of the camera on load. Try to use the mouse wheel and the
+                    scale up/scale down buttons to see if the model comes into view.
+                </p>
+                <p>
+                    <h4>Object Rotation</h4>
+                    <hr />
+                    Some Models load with a different up axis, depending on the software used to create the model.
+                    The model rotation section contains radio buttons to rotate the model in the x, y or z direction
+                    in order to fix the orientation for viewing your model. This is more likely needed for <b>stl</b>
+                    files.
+                </p>  
             </div>
 
+            <div id="disp_tmp_path"></div>
         </div>
         <!--Side Menu End-->
 
@@ -267,10 +273,16 @@
                             </label>
                         </li>
                         <li>Fix Rotation of Imported Models<hr style="margin-top:0px" /></li>
+
+                        <!--<li style="display:inline-block;">
+                            <button class="rotateButton" id="Rotate_X">Rotate X</button>
+                            <button class="rotateButton" id="Rotate_Y">Rotate Y</button>
+                            <button class="rotateButton" id="Rotate_Z">Rotate Z</button>                           
+                        </li>-->
                         <li>
                             <div id="rotation">
                                 <div class="radioBtn">
-                                    <input type="radio" id="r1"name="rotate" value="rotateX"> Rotate X
+                                    <input type="radio" id="r1" name="rotate" value="rotateX"> Rotate X
                                 </div>  
                                         
                                 <div class="radioBtn">
@@ -283,7 +295,9 @@
                             </div>
                         </li>
 
-                        <li><button class="resetRotateButton" type='reset' id="reset_rot">Reset</button></li>                       
+                        <li><button class="resetRotateButton" type='reset' id="reset_rot">Reset</button></li>
+
+                        
                     </ul>
                 </li>
 
