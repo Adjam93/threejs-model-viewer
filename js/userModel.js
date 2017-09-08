@@ -30,14 +30,30 @@ document.addEventListener('drop', function (event) {
 }, false);
 
 
-var loadFile = function ( file ) {
+var loadFile = function (file) {
 
     var filename = file.name;
-    var extension = filename.split( '.' ).pop().toLowerCase();
+    var extension = filename.split('.').pop().toLowerCase();
 
     var reader = new FileReader();
+
+    reader.addEventListener('progress', function (data) {
+
+        if (data.lengthComputable) { //if size of file transfer is known
+            var percentage = Math.round((data.loaded * 100) / data.total);
+            console.log(percentage);
+            statsNode.innerHTML = 'Loaded : ' + percentage + '%' + ' of ' + filename
+            + '<br>'
+            //+ 'Size of file ' + Math.round(size / 1048576) + 'Mbs'
+            //+ '<br>'
+            + '<progress value="0" max="100" class="progress"></progress>';
+            $('.progress').css({ 'width': percentage + '%' });////Width of progress bar set to the current percentage of model loaded (progress bar therefore increases in width as model loads)
+            $('.progress').val(percentage); //Set progress bar value to the current amount loaded
+        }
+
+    });
       
-    switch ( extension ) {
+    switch (extension) {
 
         case 'obj':
 
@@ -51,9 +67,6 @@ var loadFile = function ( file ) {
                 var contents = event.target.result;
 
                 model = loader.parse(contents);
-
-                document.getElementById("scale_up").disabled = false;
-                document.getElementById("scale_down").disabled = false;
 
                 var geometry;
                 model.traverse(function (child) {
@@ -71,12 +84,23 @@ var loadFile = function ( file ) {
 
                         child.material = materials.default_material;
 
+                        var wireframe2 = new THREE.WireframeGeometry(child.geometry);
+                        var edges = new THREE.LineSegments(wireframe2, materials.wireframeAndModel);
+                        materials.wireframeAndModel.visible = false;
+                        model.add(edges);
+
                         setWireFrame(child);
-                        setWireframeAndModel(model);
-                        setGlowModel(model);
+                        setWireframeAndModel(child);
+
+                        glowModel = new THREE.Mesh(child.geometry, materials.glowMaterial);
+                        materials.glowMaterial.visible = false;
+                        glowModel.position = model.position;
+                        glowModel.scale.multiplyScalar(1.025);
+                        model.add(glowModel);                      
                         setGlow(child);
+
                         setPhong(child);
-                        setXray(child);
+                        setXray(child); 
 
                     }
                 });
@@ -117,6 +141,119 @@ var loadFile = function ( file ) {
 
             //ADD MORE FILE TYPE CASES HERE E.G. STL, COLLADA
 
+
+
+        case 'stl':
+
+            reader.addEventListener('load', function (event) {
+
+                //When file type matches case - remove sample model or remove previously loaded model from user file
+                scene.remove(sample_model);
+                removeModel();
+                modelLoaded = true;
+
+                var contents = event.target.result;
+
+                var geometry = new THREE.STLLoader().parse(contents);
+
+                console.log(geometry);
+
+                model = new THREE.Mesh(geometry, materials.default_material);
+
+                model.traverse(function (child) {
+
+                    if (child instanceof THREE.Mesh) {
+
+                        //Convert to normal geometry in order to apply computation of vertex normals and face normals
+                        //and to merge vertices.
+                        var geometry2 = new THREE.Geometry().fromBufferGeometry(child.geometry);
+
+                        if (geometry2 !== undefined) {
+                            //Dislay file name, number of vertices and faces info of model
+                            statsNode.innerHTML = 'Name of model/file: ' + filename
+                                + '<br>'
+                                + 'Number of vertices: ' + geometry2.vertices.length
+                                + '<br>'
+                                + 'Number of faces: ' + geometry2.faces.length;
+                        }
+
+                        //Merge vertices to clean up any unwanted vertex data - duplicated vertices are removed
+                        //and faces' vertices are updated.
+                        geometry2.mergeVertices();
+
+                        //Need to compute these as some .stl models load in black, due to problem with normals
+                        geometry2.computeVertexNormals();
+                        geometry2.computeFaceNormals();
+
+                        //Apply above changes to normal geometry, then convert back to three.js bufferGeometry
+                        child.geometry = new THREE.BufferGeometry().fromGeometry(geometry2);
+
+                        child.material = materials.default_material;
+
+                        var wireframe2 = new THREE.WireframeGeometry(child.geometry);
+                        var edges = new THREE.LineSegments(wireframe2, materials.wireframeAndModel);
+                        materials.wireframeAndModel.visible = false;
+                        model.add(edges);
+
+                        setWireFrame(child);  
+                        setWireframeAndModel(child);
+
+                        glowModel = new THREE.Mesh(geometry, materials.glowMaterial);
+                        glowModel.visible = false;
+                        materials.glowMaterial.visible = false;
+                        glowModel.position = model.position;
+                        glowModel.scale.multiplyScalar(1.025);
+                        model.add(glowModel);
+
+                        setGlow(child); 
+
+                        setPhong(child);
+                        setXray(child); 
+
+                    }
+                });
+
+                setCamera(model);
+
+                model.position.set(0, 0, 0);
+
+                setBoundBox(model);
+                setPolarGrid(model);
+                setGrid(model);
+                setAxis(model);
+
+                scaleUp(model);
+                scaleDown(model);
+
+                fixRotation(model);
+                //fixRotation(glowModel);
+
+                //Reset only runs when user model is loaded, as sample models all have correct orientation
+                $("#reset_rot").click(function () {
+                    model.rotation.set(0, 0, 0);
+                   // glowModel.rotation.set(0, 0, 0);
+                    polar_grid_helper.rotation.set(0, 0, 0);
+                    gridHelper.rotation.set(0, 0, 0);
+                    axis_view.rotation.set(0, 0, 0);
+                    $('input[name="rotate"]').prop('checked', false);
+                });
+
+
+                scene.add(model);
+
+            }, false);
+
+            if (reader.readAsBinaryString !== undefined) {
+
+                reader.readAsBinaryString(file);
+
+            } else {
+
+                reader.readAsArrayBuffer(file);
+            }
+
+            break;
+
         default:
 
             alert( 'Unsupported file format (' + extension +  ').' );
@@ -124,19 +261,4 @@ var loadFile = function ( file ) {
             break;
     }
 
-    reader.addEventListener('progress', function (data) {
-
-        if (data.lengthComputable) { //if size of file transfer is known
-            var percentage = Math.round((data.loaded * 100) / data.total);
-            console.log(percentage);
-            statsNode.innerHTML = 'Loaded : ' + percentage + '%' + ' of ' + filename
-            + '<br>'
-            //+ 'Size of file ' + Math.round(size / 1048576) + 'Mbs'
-            //+ '<br>'
-            + '<progress value="0" max="100" class="progress"></progress>';
-            $('.progress').css({ 'width': percentage + '%' });////Width of progress bar set to the current percentage of model loaded (progress bar therefore increases in width as model loads)
-            $('.progress').val(percentage); //Set progress bar value to the current amount loaded
-        }
-
-    });
 };
