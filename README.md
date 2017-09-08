@@ -1,5 +1,7 @@
 # WebGl-Three.js-.obj-Model-Viewer
-An application using the Three.js library to allow user to load .obj files and view them online with multiple viewing options.
+An application using the Three.js library to allow user to load model files and view them online with multiple viewing options.
+
+<b>Viewer Currently Supports .obj and .stl file formats</b>
 
 <b>Features:</b>
 - View sample models from dropdown list
@@ -18,7 +20,7 @@ An application using the Three.js library to allow user to load .obj files and v
 
 <b>Potential Features:</b>
 - Make menus collapsible
-- Load more formats e.g. Collada, STL, GLTF, etc.
+- Load more formats e.g. Collada, GLTF, etc.
 - Allow user to load model with .mtl (material) file and images
 - ZIP file support
 
