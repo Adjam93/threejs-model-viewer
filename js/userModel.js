@@ -138,11 +138,6 @@ var loadFile = function (file) {
 
             break;
 
-
-            //ADD MORE FILE TYPE CASES HERE E.G. STL, COLLADA
-
-
-
         case 'stl':
 
             reader.addEventListener('load', function (event) {
@@ -198,7 +193,7 @@ var loadFile = function (file) {
                         setWireFrame(child);  
                         setWireframeAndModel(child);
 
-                        glowModel = new THREE.Mesh(geometry, materials.glowMaterial);
+                        glowModel = new THREE.Mesh(child.geometry, materials.glowMaterial);
                         glowModel.visible = false;
                         materials.glowMaterial.visible = false;
                         glowModel.position = model.position;
@@ -237,8 +232,7 @@ var loadFile = function (file) {
                     axis_view.rotation.set(0, 0, 0);
                     $('input[name="rotate"]').prop('checked', false);
                 });
-
-
+                
                 scene.add(model);
 
             }, false);
