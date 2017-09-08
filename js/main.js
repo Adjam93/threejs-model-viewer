@@ -1,4 +1,6 @@
+var container = document.getElementById('container');
 var view = document.getElementById('main_viewer');
+
 if (!Detector.webgl) Detector.addGetWebGLMessage();
 
 var camera, camerHelper, scene, renderer, loader,
@@ -37,6 +39,7 @@ var materials = {
         specular: 0x000, emissive: 0x000,
         shading: THREE.SmoothShading, depthWrite: true, depthTest: true
     }),
+    wireframeAndModel: new THREE.LineBasicMaterial({ color: 0xffffff }),
     phongMaterial: new THREE.MeshPhongMaterial({
         color: 0x555555, specular: 0xffffff, shininess: 10,
         shading: THREE.SmoothShading, side: THREE.DoubleSide
@@ -79,9 +82,7 @@ function initScene(index) {
     camera.position.set(0, 0, 20);
 
     //Setup renderer
-    //renderer = new THREE.CanvasRenderer({ alpha: true });
-    //renderer = Detector.webgl? new THREE.WebGLRenderer(): new THREE.CanvasRenderer();
-    renderer = new THREE.WebGLRenderer({ alpha: true });  
+    renderer = new THREE.WebGLRenderer({ alpha: true });
     renderer.setSize(winDims[0], winDims[1]);
     renderer.setClearColor(0x292121); //565646, 292121
 
@@ -164,8 +165,8 @@ function initScene(index) {
             bg_Texture = true; //Only run background scene, when background texture is loaded
 
             // Load the background texture
-            var loader = new THREE.TextureLoader();
-            var texture = loader.load(reader.result);
+            var tex_loader = new THREE.TextureLoader();
+            var texture = tex_loader.load(reader.result);
 
             //Plane mesh to hold background texture from image file
             backgroundMesh = new THREE.Mesh(
@@ -220,6 +221,8 @@ function initScene(index) {
         sample_model = data;
         sample_model_loaded = true;
 
+        console.log(sample_model);
+
         sample_model.traverse(function (child) {
             if (child instanceof THREE.Mesh) {
 
@@ -235,19 +238,29 @@ function initScene(index) {
                 }
 
                 child.material = materials.default_material;
+
+                var wireframe2 = new THREE.WireframeGeometry(child.geometry);
+                var edges = new THREE.LineSegments(wireframe2, materials.wireframeAndModel);
+                materials.wireframeAndModel.visible = false;
+                sample_model.add(edges);
+
                 setWireFrame(child);
-                setWireframeAndModel(sample_model);
+                setWireframeAndModel(child);
+
                 setPhong(child);
                 setXray(child);
+
                 setGlowModel(sample_model);
+
                 setGlow(child);
             }
         });
 
-       /*if (sceneInfo.objectRotation) {
-            sample_model.rotation.copy(sceneInfo.objectRotation);
-        }*/
-       
+        var matrix = new THREE.Matrix4();
+    
+        matrix.extractRotation(sample_model.matrix);
+        console.log(matrix);
+
         setCamera(sample_model);
 
         setBoundBox(sample_model);
@@ -355,7 +368,6 @@ function getColours(r, g, b) {
     return colour;
 }
 
-
 function render() {
     setColours();
 
@@ -375,24 +387,26 @@ function animate() {
     render();
 }
 var modelList = [
-                    {
-                        name: "crash.obj", url: 'sample_models/crash2.obj'
-                    },
-                    {
-                        name: "bear.obj", url: 'sample_models/bear-obj.obj'
-                    },
-                    {
-                        name: "car.obj", url: 'sample_models/car2.obj'
-                    },
-                    {
-                        name: "tiger.obj", url: 'sample_models/Tiger.obj'
-                    },
-                    {
-                        name: "dinosaur.obj", url: 'sample_models/Dinosaur_V02.obj'
-                    },
-                    {
-                        name: "skeleton.obj", url: 'sample_models/skeleton.obj'
-                    }
+            {
+                name: "crash.obj", url: 'sample_models/crash2.obj'
+            },
+            {
+                name: "bear.obj", url: 'sample_models/bear-obj.obj'
+            },
+            {
+                name: "car.obj", url: 'sample_models/car2.obj'
+                //, objectRotation: new THREE.Euler(0, 3 * Math.PI / 2, 0)
+                        
+            },
+            {
+                name: "tiger.obj", url: 'sample_models/Tiger.obj'
+            },
+            {
+                name: "dinosaur.obj", url: 'sample_models/Dinosaur_V02.obj'
+            },
+            {
+                name: "skeleton.obj", url: 'sample_models/skeleton.obj'
+            }
 ];
 
 function switchScene(index) {
@@ -410,7 +424,7 @@ function selectModel() {
     var index = select.selectedIndex;
 
     if (index >= 0) {
-        removeModel();
+        removeModel();     
         switchScene(index);
     }
 
