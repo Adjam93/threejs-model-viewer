@@ -21,6 +21,10 @@ body {
     overflow-x: hidden;        
 }
 
+.statsText{
+    color: #FFF27F;
+}
+
 #sampleMods {
     position: absolute;
     right: 10px;
@@ -29,6 +33,32 @@ body {
     font-family: 'Titillium Web', sans-serif;
     font-size:14px;   
     color:white;      
+}
+
+#collapse_side {
+    position: absolute;
+    left: 20%;
+    top: 5px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0);
+    padding: 3px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    font-size: 30px;      
+}
+
+#collapse_btm {
+    position: absolute;
+    left: 20%;
+    top: 73%;        
+    color: #fff;
+    background: rgba(0, 0, 0, 0);
+    padding: 3px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    font-size: 30px;      
 }
         
 #fullscreen {
@@ -325,7 +355,7 @@ input:checked + .grid:before {
     background-color: #4d4dff;
 }
 
-input[type="file"] {
+#obj_file {
     display: none;
 }
 .model-upload, #remove {
