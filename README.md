@@ -19,7 +19,6 @@ An application using the Three.js library to allow user to load model files and 
 - Add view helpers such as bounding box, square/circular grid underneath model and an axis
 
 <b>Potential Features:</b>
-- Make menus collapsible
 - Load more formats e.g. Collada, GLTF, etc.
 - Allow user to load model with .mtl (material) file and images
 - ZIP file support
