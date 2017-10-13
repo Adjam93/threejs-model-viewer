@@ -13,7 +13,7 @@ body {
     background: rgba(0, 0, 0, 0.5);
     padding: 10px;
     width: 200px;
-    height: 60px;
+    height: 80px;
     border: solid 1px black;
     border-radius: 5px;
     font-family: 'Titillium Web', sans-serif;
@@ -29,7 +29,7 @@ body {
     position: absolute;
     right: 10px;
     top: 5px;  
-    margin-top:88px;      
+    margin-top: 108px;      
     font-family: 'Titillium Web', sans-serif;
     font-size:14px;   
     color:white;      
