@@ -71,15 +71,19 @@ var loadFile = function (file) {
                 var geometry;
                 model.traverse(function (child) {
                     if (child instanceof THREE.Mesh) {
+
+                        numOfMeshes++;
                         geometry = new THREE.Geometry().fromBufferGeometry(child.geometry);
 
                         if (geometry !== undefined) {
                             //Dislay file name, number of vertices and faces info of model
-                            statsNode.innerHTML = 'Name of model/file: ' + filename
-                                + '<br>'
-                                + 'Number of vertices: ' + geometry.vertices.length
-                                + '<br>'
-                                + 'Number of faces: ' + geometry.faces.length;
+                            statsNode.innerHTML = 'Name of model/file: ' + '<span class="statsText">' + filename + '</span>'
+                            + '<br>'
+                            + 'Number of vertices: ' + '<span class="statsText">' + geometry.vertices.length + '</span>'
+                            + '<br>'
+                            + 'Number of faces: ' + '<span class="statsText">' + geometry.faces.length + '</span>'
+                            + '<br>'
+                            + 'Number of Meshes: ' + '<span class="statsText">' + numOfMeshes + '</span>';
                         }
 
                         child.material = materials.default_material;
@@ -138,6 +142,11 @@ var loadFile = function (file) {
 
             break;
 
+
+            //ADD MORE FILE TYPE CASES HERE E.G. STL, COLLADA
+
+
+
         case 'stl':
 
             reader.addEventListener('load', function (event) {
@@ -159,17 +168,21 @@ var loadFile = function (file) {
 
                     if (child instanceof THREE.Mesh) {
 
+                         numOfMeshes++;
+
                         //Convert to normal geometry in order to apply computation of vertex normals and face normals
                         //and to merge vertices.
                         var geometry2 = new THREE.Geometry().fromBufferGeometry(child.geometry);
 
                         if (geometry2 !== undefined) {
                             //Dislay file name, number of vertices and faces info of model
-                            statsNode.innerHTML = 'Name of model/file: ' + filename
+                            statsNode.innerHTML = 'Name of model/file: ' + '<span class="statsText">' + filename + '</span>'
                                 + '<br>'
-                                + 'Number of vertices: ' + geometry2.vertices.length
+                                + 'Number of vertices: ' + '<span class="statsText">' + geometry2.vertices.length + '</span>'
                                 + '<br>'
-                                + 'Number of faces: ' + geometry2.faces.length;
+                                + 'Number of faces: ' + '<span class="statsText">' + geometry2.faces.length + '</span>'
+                                + '<br>'
+                                + 'Number of Meshes: ' + '<span class="statsText">' + numOfMeshes + '</span>';
                         }
 
                         //Merge vertices to clean up any unwanted vertex data - duplicated vertices are removed
@@ -232,7 +245,8 @@ var loadFile = function (file) {
                     axis_view.rotation.set(0, 0, 0);
                     $('input[name="rotate"]').prop('checked', false);
                 });
-                
+
+
                 scene.add(model);
 
             }, false);
