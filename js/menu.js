@@ -108,7 +108,7 @@ $(document).ready(function () {
 
             // move the right collapse back along with menu
             $('#collapse_btm').css('position', 'absolute').animate({
-                top: '-=270'
+                bottom: '+=270'
             }, {
                 duration: 600,
                 complete: function () {
