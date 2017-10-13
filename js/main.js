@@ -90,31 +90,10 @@ function initScene(index) {
 
     THREEx.WindowResize(renderer, camera);
 
-    function toggleFullscreen(elem) {
-        elem = elem || document.documentElement;
-        if (!document.fullscreenElement && !document.mozFullScreenElement &&
-            !document.webkitFullscreenElement && !document.msFullscreenElement) {
-
-            THREEx.FullScreen.request(container);
-
+    $('#fullscreenBtn').on('click', function () {
+        if (screenfull.enabled) {
+            screenfull.toggle($('#main_viewer')[0]);
         }
-        else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-                renderer.setSize(winDims[0], winDims[1]); //Reset renderer size on fullscreen exit
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-                renderer.setSize(winDims[0], winDims[1]);
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-                renderer.setSize(winDims[0], winDims[1]);
-            }
-        }
-    }
-    document.getElementById('fullscreenBtn').addEventListener('click', function () {
-        toggleFullscreen();
     });
 
     ambient = new THREE.AmbientLight(0x404040);
@@ -230,11 +209,11 @@ function initScene(index) {
 
                 if (geometry !== undefined) {
                     //Dislay file name, number of vertices and faces info of model
-                    statsNode.innerHTML = 'Name of model/file: ' + sceneInfo.name
-                        + '<br>'
-                        + 'Number of vertices: ' + geometry.vertices.length
-                        + '<br>'
-                        + 'Number of faces: ' + geometry.faces.length;
+                    statsNode.innerHTML = 'Name of model/file: ' + '<span class="statsText">' + sceneInfo.name + '</span>'
+                               + '<br>'
+                               + 'Number of vertices: ' + '<span class="statsText">' + geometry.vertices.length + '</span>'
+                               + '<br>'
+                               + 'Number of faces: ' + '<span class="statsText">' + geometry.faces.length + '</span>';
                 }
 
                 child.material = materials.default_material;
