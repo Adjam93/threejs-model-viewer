@@ -4,7 +4,7 @@ var view = document.getElementById('main_viewer');
 if (!Detector.webgl) Detector.addGetWebGLMessage();
 
 var camera, camerHelper, scene, renderer, loader,
-    stats, controls, model, sample_model, glowModel, scale, delta;
+    stats, controls, numOfMeshes = 0, model, sample_model, glowModel, scale, delta;
 
 var modelLoaded = false;
 var bg_Texture = false;
@@ -205,6 +205,7 @@ function initScene(index) {
         sample_model.traverse(function (child) {
             if (child instanceof THREE.Mesh) {
 
+                numOfMeshes++;
                 geometry = new THREE.Geometry().fromBufferGeometry(child.geometry);
 
                 if (geometry !== undefined) {
@@ -213,7 +214,9 @@ function initScene(index) {
                                + '<br>'
                                + 'Number of vertices: ' + '<span class="statsText">' + geometry.vertices.length + '</span>'
                                + '<br>'
-                               + 'Number of faces: ' + '<span class="statsText">' + geometry.faces.length + '</span>';
+                               + 'Number of faces: ' + '<span class="statsText">' + geometry.faces.length + '</span>'
+                               + '<br>'
+                               + 'Number of Meshes: ' + '<span class="statsText">' + numOfMeshes + '</span>';
                 }
 
                 child.material = materials.default_material;
@@ -261,6 +264,7 @@ function removeModel() {
     scene.remove(glowModel); //Remove glow model if present
     materials.glowMaterial.visible = false;
     scale = 1;
+    numOfMeshes = 0;
 
     camera.position.set(0, 0, 20); //Reset camera to initial position
     controls.reset(); //Reset controls, for when previous object has been moved around e.g. larger object = larger rotation
