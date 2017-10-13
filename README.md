@@ -23,4 +23,4 @@ An application using the Three.js library to allow user to load model files and 
 - Allow user to load model with .mtl (material) file and images
 - ZIP file support
 
-<h2><a href="http://adjam.heliohost.org/3d-viewer" target="_blank">DEMO</a></h2>
+<h2><a href="http://adjam.heliohost.org/3d-viewer" target="_blank">View the Project</a></h2>
