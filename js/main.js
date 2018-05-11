@@ -295,7 +295,7 @@ $("#red, #green, #blue, #ambient_red, #ambient_green, #ambient_blue").slider({
     }
 });
 
-var rotVal = [230, 400, 600, 750, 960, 1200, 1500, 1800, 1900, 2100, 2350]; //Rotation speeds low - high
+var rotVal = [40, 80, 110, 140, 170, 200, 240, 280, 340, 400, 520]; //Rotation speeds low - high
 var rotation_speed;
 
 $("#rot_slider").slider({
