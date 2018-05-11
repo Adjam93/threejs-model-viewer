@@ -11,7 +11,7 @@ $(document).ready(function () {
             // open new menu and add the open class
             $(this).next("ul").slideDown(350);
             $(this).addClass("active");
-           // $(".side_menu").niceScroll({ horizrailenabled: false }); //add jquery nicescroll with horizontal scroll disabled
+            //$(".side_menu").niceScroll({ horizrailenabled: false }); //add jquery nicescroll with horizontal scroll disabled
             
         } else if ($(this).hasClass("active")) {
 
@@ -31,6 +31,7 @@ $(document).ready(function () {
             // open new menu and add the open class
             $(this).next("ul").slideDown(350);
             $(this).addClass("active");
+            //$("#bottom_menu").niceScroll();
 
         } else if ($(this).hasClass("active")) {
 
@@ -38,6 +39,7 @@ $(document).ready(function () {
             $(this).next("ul").slideUp(350);
         }
     });
+
 
     var side_collapsed = false;
     var btm_collapsed = false;
@@ -50,8 +52,6 @@ $(document).ready(function () {
 
         if (side_collapsed) {
             $('.side_menu').toggle('slide', 'left', 1200);
-            renderer.setSize(window.innerWidth, window.innerHeight);
-
             // move the left collapse arrow along with menu and set it to be a right arrow (bring back menu)
             $('#collapse_side').css('position', 'absolute').animate({
                 left: '-=270'
@@ -64,8 +64,6 @@ $(document).ready(function () {
         }
         else {
             $('.side_menu').toggle('slide', 'left', 1200);
-            renderer.setSize(winDims[0], winDims[1]);
-
             // move the right collapse back along with menu
             $('#collapse_side').css('position', 'absolute').animate({
                 left: '+=270'
@@ -88,8 +86,6 @@ $(document).ready(function () {
         if (btm_collapsed) {
             //$('#bottom_menu').toggle('slide', 'down', 1200);
             $("#bottom_menu").slideToggle("slow");
-            renderer.setSize(window.innerWidth, window.innerHeight);
-
             // move the left collapse arrow along with menu and set it to be a right arrow (bring back menu)
             $('#collapse_btm').css('position', 'absolute').animate({
                 bottom: '-=270'
@@ -104,8 +100,6 @@ $(document).ready(function () {
         else {
             //$('#bottom_menu').toggle('slide', 'down', 1200);
             $("#bottom_menu").slideToggle("slow");
-            renderer.setSize(winDims[0], winDims[1]);
-
             // move the right collapse back along with menu
             $('#collapse_btm').css('position', 'absolute').animate({
                 bottom: '+=270'
