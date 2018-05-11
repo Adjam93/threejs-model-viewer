@@ -12,7 +12,7 @@ An application using the Three.js library to allow user to load model files and 
 - View model in wireframe model and model+wireframe mode
 - Apply phong shading mode and increase/decrease the shininess level
 - View model in x-ray
-- Apply glow outline to model and set the colour of the glow model
+- Apply glow outline pass to the model and set the edge colour of the glow
 - Set background colour of the renderer or set selected image to be the background
 - Auto-rotate the model and adjust the rotation speed
 - Scale the model up and down
@@ -23,4 +23,4 @@ An application using the Three.js library to allow user to load model files and 
 - Allow user to load model with .mtl (material) file and images
 - ZIP file support
 
-<h2><a href="http://adjam.heliohost.org/3d-viewer" target="_blank">View the Project Online</a></h2>
+<h2><a href="https://adjam93.github.io/threejs-model-viewer/" target="_blank">View the Project Online</a></h2>
