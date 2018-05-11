@@ -259,8 +259,6 @@ function initScene(index) {
 function removeModel() {
 
     scene.remove(model);
-    scene.remove(glowModel); //Remove glow model if present
-    materials.glowMaterial.visible = false;
     scale = 1;
     numOfMeshes = 0;
 
