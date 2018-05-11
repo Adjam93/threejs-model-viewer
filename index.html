@@ -3,7 +3,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>WebGL Model Viewer</title>
+    <title>Three.js Model Viewer</title>
 
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -13,24 +13,32 @@
     <link rel="shortcut icon" href="favicon.ico">
 
     <link rel='stylesheet' href='css/spectrum.css' />
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <!--Three.js scripts-->
     <script src="js/three.js"></script>
-    <script src="js/CanvasRenderer.js"></script>
+
     <script src="js/Projector.js"></script>
     <script src="js/Detector.js"></script>
 
+    <script src="js/MTLLoader.js"></script>
     <script src="js/OBJLoader.js"></script>
+    <script src="js/ColladaLoader2.js"></script>
     <script src="js/STLLoader.js"></script>
     <script src="js/DDSLoader.js"></script>
 
     <script src="js/OrbitControls.js"></script>
 
-    <!--<script src="js/THREEx.FullScreen.js"></script>-->
-    <script src="js/screenfull.min.js"></script>
+    <script src="js/THREEx.FullScreen.js"></script>
     <script src="js/THREEx.WindowResize.js"></script>
+    <script src="js/screenfull.min.js"></script>
+
+    <!--Post-Processing-->
+    <script src="js/effects/CopyShader.js"></script>
+    <script src="js/effects/EffectComposer.js"></script>
+    <script src="js/effects/ShaderPass.js"></script>
+    <script src="js/effects/OutlinePass.js"></script>
+    <script src="js/effects/SSAARenderPass.js"></script>
 
     <script src="js/jquery.nicescroll.js"></script>
     <script src="js/spectrum.js"></script>
@@ -98,6 +106,16 @@
         <!--Side Menu Start-->
         <div class="side_menu">
             <ul class="menu_item">
+
+                <li id="header">
+                    <table style="width:100%">
+                        <tr>
+                            <th style="font-size: 15px;">Viewer Theme</th>
+                            <th style="font-size: 11px;"><button id="lightSkin">Light</button></th>
+                            <th style="font-size: 11px;"><button id="darkSkin">Dark</button></th>
+                        </tr>
+                    </table>
+                </li>
 
                 <li class='dropdown'>
                     <a href='#'><img src="images/ambient_icon.png" class="image" />Ambient Light</a>
@@ -181,9 +199,9 @@
                 </li>
 
                 <li class='dropdown'>
-                    <a href='#'><img src="images/glow_icon.png" width="32" height="32" class="image" />Glow Shader</a>
+                    <a href='#'><img src="images/glow_icon.png" width="32" height="32" class="image" />Glow Outline</a>
                     <ul>
-                        <li> <span>Glow</span></li>
+                        <li> <span>Glow Outline</span></li>
                         <li>
                             <label class="switch">
                                 <input class="check" type="checkbox" name="mod_mat" id="glow_check">
@@ -202,9 +220,6 @@
                         <li> <span>Set Background Colour</span></li>
                         <li><input type='text' class="bg_select" /></li>
                         <li><em id='basic_log'></em></li>
-                        <li>Set Background Image</li>
-                        <li><input type="file" id="bg_tex" accept="image/*" /></li>
-                        <li><button type="button" id="remove_bg">Remove Background</button></li>
                     </ul>
                 </li>
 
@@ -220,23 +235,21 @@
                             <button class="qBtn" id="q_btn" title="Model Loading Help"><i class="fa fa-question-circle q_mark"></i></button>
                         </li>                  
                         <li><input onclick="this.value=null;" type="file" id="obj_file" /></li>
-                        <!-- onclick value = null to fix for when a user clicks remove model,
-                            they can click load model and reload the same model, as this was returning
-                            blank before -->
-
                         <li><button type="button" id="remove"><i style="margin-right: 5px;" class="fa fa-trash"></i> Remove file</button></li>
+                        <li><input id="file-upload-input" type="file" name="files[]" multiple="" class="inputfile"></li>
+                        <li><output id="result" /></li>
                     </ul>
                 </li>
             </ul>
 
             <div id="load_help" title="Loading Models">
-               <p>Locate the model file you wish to view. Textures/associated images of the model
+                <p>Locate the model file you wish to view. Textures/associated images of the model
                    are not currently supported, so only select the model file.
                 </p>
                 <h4>Supported File Types</h4>
-                <ul>
-                    <li>.obj</li>
-                    <li>.stl</li>
+                <ul >
+                    <li><span style="color: green">.obj</span></li>
+                    <li><span style="color: green">.stl</span></li>
                 </ul>
                 <p>
                     <h4>Model Sizes</h4>
@@ -249,12 +262,12 @@
                     <hr />
                     Some Models load with a different up axis, depending on the software used to create the model.
                     The model rotation section contains radio buttons to rotate the model in the x, y or z direction
-                    in order to fix the orientation for viewing your model. This is more likely needed for <b>stl</b>
-                    files.
+                    in order to fix the orientation for viewing your model. Most often <b>X axis</b> rotation is the one required.
                 </p>  
             </div>
 
             <div id="disp_tmp_path"></div>
+
         </div>
         <!--Side Menu End-->
 
@@ -277,11 +290,6 @@
                         </li>
                         <li>Fix Rotation of Imported Models<hr style="margin-top:0px" /></li>
 
-                        <!--<li style="display:inline-block;">
-                            <button class="rotateButton" id="Rotate_X">Rotate X</button>
-                            <button class="rotateButton" id="Rotate_Y">Rotate Y</button>
-                            <button class="rotateButton" id="Rotate_Z">Rotate Z</button>                           
-                        </li>-->
                         <li>
                             <div id="rotation">
                                 <div class="radioBtn">
@@ -298,9 +306,7 @@
                             </div>
                         </li>
 
-                        <li><button class="resetRotateButton" type='reset' id="reset_rot">Reset</button></li>
-
-                        
+                        <li><button class="resetRotateButton" type='reset' id="reset_rot">Reset</button></li>                     
                     </ul>
                 </li>
 
@@ -347,17 +353,17 @@
                         </li>
                     </ul>
                 </li>
-            </ul>
+            </ul>           
         </div>
         <!--Bottom Menu End-->
 
         <div id="main_viewer"></div>
 
-        <!--<div id="fullscreen">
+        <div id="fullscreen">
             <button id="fullscreenBtn" title="Fullscreen Mode" style="border: 0; float:right; background: transparent">
                 <img src="images/fullscreen.png" width="32" height="32" alt="fullscreen" />
             </button>
-        </div>-->
+        </div>
 
         <div id="sampleMods">
             Sample Models
@@ -370,6 +376,13 @@
                 <option>Dinosaur Model (5.07 MB)</option>
                 <option>Skeleton Model (5.52 MB)</option>
             </select>
+            <br /><br />
+          
+            <span id="smooth-model" style="font-size:18px">Smooth Model</span>
+            <label class="switch helper">
+                <input type="checkbox" id="smooth">
+                <span class="toggle grid round"></span>
+            </label>
         </div>
 
         <script src="js/menu.js"></script>
@@ -378,7 +391,7 @@
         <script src="js/userModel.js"></script>
     </div>
 
-    <!--<script src="js/ColourTheme.js"></script>-->
+    <script src="js/ColourTheme.js"></script>
 
     <script>
         $(document).ready(function () {
