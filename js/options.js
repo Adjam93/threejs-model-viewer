@@ -9,34 +9,17 @@ function setCamera(mod) {
     camera.lookAt(pos);
 }
 
-function setGlowModel(mod) {
+$('#glow_check').on('change', function () {
 
-    //This function only works for the sample models - as the first mesh found provides the outline mesh for glow effect
-    glowModel = new THREE.Mesh(mod.children[0].geometry, materials.glowMaterial); //mod.children[0] - the first mesh found in object
-    materials.glowMaterial.visible = false;
-    glowModel.position = mod.position;
-    glowModel.scale.multiplyScalar(1.025);
-    mod.add(glowModel);
-
-}
-
-function setGlow(mod) {
-
-    $('#glow_check').on('change', function () {
         if (glow.checked) {
-
             $('input.check').not(this).prop('checked', false);
-            materials.glowMaterial.visible = true;
-            glowModel.visible = true; //STL models - glowModel mesh is set to visible = false initially
+            outlinePass.enabled = true;
         }
         else {
-            materials.glowMaterial.visible = false;
-           // glowModel.visible = false;
-            //scene.remove(glowModel);
-            mod.material = materials.default_material;
+            outlinePass.enabled = false;
         }
-    });
-}
+        
+});
 
 function setWireFrame(mod) {
 
@@ -72,11 +55,44 @@ function setWireframeAndModel(mod) {
 
 }
 
+function setSmooth(mod) {
+
+    mod.traverse(function (child) {
+
+        if (child instanceof THREE.Mesh) {
+
+            $('#smooth').change(function () {
+               
+                var smooth_geom = new THREE.Geometry().fromBufferGeometry(child.geometry);
+
+                if (smooth.checked) {
+                    document.getElementById('smooth-model').innerHTML = "Flatten Model";
+
+                    smooth_geom.mergeVertices();
+                    smooth_geom.computeVertexNormals();
+                    smooth_geom.computeFaceNormals();
+                    child.geometry = new THREE.BufferGeometry().fromGeometry(smooth_geom);
+                }
+                else {
+                    document.getElementById('smooth-model').innerHTML = "Smooth Model";
+
+                    smooth_geom.computeFlatVertexNormals();
+                    child.geometry = new THREE.BufferGeometry().fromGeometry(smooth_geom);
+                }
+            });
+
+        }
+
+    });
+
+}
+
+
 function setPhong(mod) {
 
     $('#phong_check').on('change', function () {
 
-        $('input.check').not(this).prop('checked', false);
+        $('input.check').not(this).prop('checked', false); //Uncheck any other checked inputs with class=check
 
         phong.checked ? mod.material = materials.phongMaterial : mod.material = materials.default_material;
     });
@@ -89,7 +105,7 @@ function setXray(mod) {
 
         $('input.check').not(this).prop('checked', false);
 
-        xray.checked ? (mod.material = materials.xrayMaterial, materials.glowMaterial.visible = false) : mod.material = materials.default_material;
+        xray.checked ? mod.material = materials.xrayMaterial_: mod.material = materials.default_material;      
       
     });
 }
@@ -138,7 +154,6 @@ $('#polar_grid').change(function () {
     }
 });
 
-
 function setGrid(mod) {
 
     var bbox2 = new THREE.Box3().setFromObject(mod);
@@ -167,7 +182,7 @@ function setAxis(mod) {
     var bbox3 = new THREE.Box3().setFromObject(mod);
 
     /*AXIS HELPER*/
-    axis_view = new THREE.AxisHelper(bbox3.max.z * 10); //Set axis size based on the non visible box3() size.
+    axis_view = new THREE.AxesHelper(bbox3.max.z * 10); //Set axis size based on the non visible box3() size.
     axis_view.position.y = bbox3.min.y; //Set axis underneath loaded model object
     axis_view.visible = false; //axis visibility initially false, until axis checkbox is selected
     mod.add(axis_view);
@@ -206,9 +221,8 @@ $(".glow_select").spectrum({
     change: function (color) {
         $("#basic-log").text("Hex Colour Selected: " + color.toHexString()); //Log information
         glow_value = $(".glow_select").spectrum('get').toHexString(); //Get the colour selected
-        //Set glow material colour to selected value
-        materials.glowMaterial.uniforms.glowColor.type = "c";
-        materials.glowMaterial.uniforms.glowColor.value = new THREE.Color(glow_value);
+        //Set outlinePass effect edge colour to selected value
+        outlinePass.visibleEdgeColor.set(glow_value);
     }
 });
 
@@ -221,6 +235,7 @@ function scaleUp(mod) {
    // User clicks scale button once at a time, scale applied once
     $('#scale_up').click(function (e) {
         if (modelLoaded || sample_model_loaded) {
+            // scale *= 1.15;
 
             if (mod.scale.z < 25) {
 
@@ -237,6 +252,8 @@ function scaleDown(mod) {
     //User clicks scale button once at a time, scale applied once
     $('#scale_down').click(function (e) {
         if (modelLoaded || sample_model_loaded) {
+
+            //scale *= 0.85;
 
             scale -= (scale * 0.35);
             mod.scale.x = mod.scale.y = mod.scale.z = scale;
