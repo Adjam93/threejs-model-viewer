@@ -105,7 +105,7 @@ function setXray(mod) {
 
         $('input.check').not(this).prop('checked', false);
 
-        xray.checked ? mod.material = materials.xrayMaterial_: mod.material = materials.default_material;      
+        xray.checked ? mod.material = materials.xrayMaterial : mod.material = materials.default_material;      
       
     });
 }
