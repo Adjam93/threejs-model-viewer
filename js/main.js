@@ -4,12 +4,13 @@ var view = document.getElementById('main_viewer');
 if (!Detector.webgl) Detector.addGetWebGLMessage();
 
 var camera, camerHelper, scene, renderer, loader,
-    stats, controls, numOfMeshes = 0, model, sample_model, glowModel, scale, delta;
+    stats, controls, numOfMeshes = 0, model, sample_model, glowModel, wireframe, mat, scale, delta;
 
+var initialMaterial;
 var modelLoaded = false;
 var bg_Texture = false;
 
-var glow_value;
+var glow_value, selectedObject, composer, effectFXAA, outlinePass, ssaaRenderPass;
 
 var ambient, directionalLight, directionalLight2, directionalLight3, bg_colour;
 var backgroundScene, backgroundCamera, backgroundMesh;
@@ -26,23 +27,26 @@ var polar_grid = document.getElementById('polar_grid');
 var axis = document.getElementById('axis');
 var bBox = document.getElementById('bBox');
 
+var smooth = document.getElementById('smooth');
+var outline = document.getElementById('outline');
+
 var statsNode = document.getElementById('stats');
 
 //X-RAY SHADER MATERIAL
 //http://free-tutorials.org/shader-x-ray-effect-with-three-js/
-
 var materials = {
     default_material: new THREE.MeshLambertMaterial({ side: THREE.DoubleSide }),
     wireframeMaterial: new THREE.MeshPhongMaterial({
         side: THREE.DoubleSide,
-        wireframe: true, shininess: 100,
+        wireframe: true, 
+        shininess: 100,
         specular: 0x000, emissive: 0x000,
         shading: THREE.SmoothShading, depthWrite: true, depthTest: true
     }),
     wireframeAndModel: new THREE.LineBasicMaterial({ color: 0xffffff }),
     phongMaterial: new THREE.MeshPhongMaterial({
         color: 0x555555, specular: 0xffffff, shininess: 10,
-        shading: THREE.SmoothShading, side: THREE.DoubleSide
+        shading: THREE.SmoothShading, side: THREE.DoubleSide // map: texture
     }),
     xrayMaterial: new THREE.ShaderMaterial({
         uniforms: {
@@ -53,20 +57,11 @@ var materials = {
         fragmentShader: document.getElementById('fragmentShader').textContent,
         side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
         transparent: true, depthWrite: false
-    }),
-    glowMaterial: new THREE.ShaderMaterial({
-        uniforms: {
-            p: { type: "f", value: 0.1 },
-            glowColor: { type: "c", value: new THREE.Color(0xffff80) },
-        },
-        vertexShader: document.getElementById('vertexShader').textContent,
-        fragmentShader: document.getElementById('fragmentShader').textContent,
-        side: THREE.BackSide, blending: THREE.AdditiveBlending, transparent: true
     })
 };
 
 var clock = new THREE.Clock();
-var winDims = [window.innerWidth * 0.8, window.innerHeight * 0.89]; //size of renderer
+//var winDims = [window.innerWidth * 0.8, window.innerHeight * 0.89]; //old size of renderer
 
 function onload() {
 
@@ -76,24 +71,45 @@ function onload() {
 }
 
 function initScene(index) {
-    scene = new THREE.Scene();
 
-    camera = new THREE.PerspectiveCamera(70, winDims[0] / winDims[1], .1, 500000);
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 500000);
+
     camera.position.set(0, 0, 20);
 
     //Setup renderer
-    renderer = new THREE.WebGLRenderer({ alpha: true });
-    renderer.setSize(winDims[0], winDims[1]);
-    renderer.setClearColor(0x292121); //565646, 292121
+    renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setClearColor(0x292121); //565646, 29212
 
     view.appendChild(renderer.domElement);
 
     THREEx.WindowResize(renderer, camera);
 
-    $('#fullscreenBtn').on('click', function () {
-        if (screenfull.enabled) {
-            screenfull.toggle($('#main_viewer')[0]);
+    function toggleFullscreen(elem) {
+        elem = elem || document.documentElement;
+        if (!document.fullscreenElement && !document.mozFullScreenElement &&
+            !document.webkitFullscreenElement && !document.msFullscreenElement) {
+
+            THREEx.FullScreen.request(container);
+
         }
+        else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+    }
+
+    document.getElementById('fullscreenBtn').addEventListener('click', function () {
+        toggleFullscreen();
     });
 
     ambient = new THREE.AmbientLight(0x404040);
@@ -123,6 +139,9 @@ function initScene(index) {
     scene.add(ambientLight);
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.09;
+    controls.rotateSpeed = 0.09;
 
     //Colour changer, to set background colour of renderer to user chosen colour
     $(".bg_select").spectrum({
@@ -131,48 +150,28 @@ function initScene(index) {
             $("#basic_log").text("Hex Colour Selected: " + color.toHexString()); //Log information
             var bg_value = $(".bg_select").spectrum('get').toHexString(); //Get the colour selected
             renderer.setClearColor(bg_value); //Set renderer colour to the selected hex value
-            document.body.style.background = bg_value; //Set body of document to selected colour
+            ssaaRenderPass.clearColor = bg_value;
+            document.body.style.background = bg_value; //Set body of document to selected colour           
         }
     });
 
-    //Function for loading image as renderer (static) background
-    $('#bg_tex').change(function () {
-        var file = this.files[0];
-        var reader = new FileReader();
-        reader.onloadend = function () {
-            renderer.setClearColor(0x000000, 0);
-            bg_Texture = true; //Only run background scene, when background texture is loaded
+    // postprocessing    
+    ssaaRenderPass = new THREE.SSAARenderPass(scene, camera);
+    ssaaRenderPass.unbiased = true;
+    ssaaRenderPass.clearColor = 0x292121;
+    ssaaRenderPass.clearAlpha = 1;
 
-            // Load the background texture
-            var tex_loader = new THREE.TextureLoader();
-            var texture = tex_loader.load(reader.result);
+    outlinePass = new THREE.OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);   
+    outlinePass.edgeStrength = 1.5; 
+    outlinePass.edgeGlow = 2; //model glow outline
 
-            //Plane mesh to hold background texture from image file
-            backgroundMesh = new THREE.Mesh(
-                new THREE.PlaneGeometry(2, 2, 0),
-                new THREE.MeshBasicMaterial({
-                    map: texture
-                }));
+    var outputPass = new THREE.ShaderPass(THREE.CopyShader);
+    outputPass.renderToScreen = true;
 
-            backgroundMesh.material.depthTest = false;
-            backgroundMesh.material.depthWrite = false;
-
-            //Create background scene
-            backgroundScene = new THREE.Scene();
-            backgroundCamera = new THREE.Camera();
-            backgroundScene.add(backgroundCamera);
-            backgroundScene.add(backgroundMesh);
-
-        }
-        if (file) {
-            reader.readAsDataURL(file);
-        } else {
-        }
-    });
-
-    $('#remove_bg').click(function () {
-        backgroundScene.remove(backgroundMesh); //remove background mesh containing the image
-    });
+    composer = new THREE.EffectComposer(renderer);
+    composer.addPass(ssaaRenderPass);
+    composer.addPass(outlinePass);
+    composer.addPass(outputPass);
 
     /*LOAD SAMPLE MODELS*/
     var sceneInfo = modelList[index]; //index from array of sample models in html select options
@@ -232,18 +231,12 @@ function initScene(index) {
                 setPhong(child);
                 setXray(child);
 
-                setGlowModel(sample_model);
-
-                setGlow(child);
             }
         });
 
-        var matrix = new THREE.Matrix4();
-    
-        matrix.extractRotation(sample_model.matrix);
-        console.log(matrix);
-
         setCamera(sample_model);
+
+        setSmooth(sample_model);
 
         setBoundBox(sample_model);
         setPolarGrid(sample_model);
@@ -253,9 +246,14 @@ function initScene(index) {
         scaleUp(sample_model);
         scaleDown(sample_model);
 
+        selectedObject = sample_model;
+        outlinePass.selectedObjects = [selectedObject];
+        outlinePass.enabled = false;
+
         scene.add(sample_model);
 
     }, onProgress, onError);
+
 }
 
 function removeModel() {
@@ -275,7 +273,9 @@ function removeModel() {
     amb.checked = false; rot1.checked = false; wire.checked = false;
     model_wire.checked = false; phong.checked = false; xray.checked = false;
     glow.checked = false; grid.checked = false; polar_grid.checked = false;
-    axis.checked = false; bBox.checked = false;//Uncheck any checked boxes
+    axis.checked = false; bBox.checked = false; smooth.checked = false;//Uncheck any checked boxes
+
+    document.getElementById('smooth-model').innerHTML = "Smooth Model";
 
     $('#rot_slider').slider({
         disabled: true //disable the rotation slider
@@ -335,6 +335,7 @@ $('#rotation').change(function () {
 });
 
 function setColours() {
+
     var colour = getColours($('#red').slider("value"), $('#green').slider("value"), $('#blue').slider("value"));
     directionalLight.color.setRGB(colour[0], colour[1], colour[2]);
     directionalLight2.color.setRGB(colour[0], colour[1], colour[2]);
@@ -347,27 +348,26 @@ function setColours() {
 }
 
 function getColours(r, g, b) {
+
     var colour = [r.valueOf() / 255, g.valueOf() / 255, b.valueOf() / 255];
     return colour;
 }
 
 function render() {
+
     setColours();
 
-    if (bg_Texture) {
-        renderer.autoClear = false;
-        renderer.clear();
-        renderer.render(backgroundScene, backgroundCamera);
-    }
-
-    renderer.render(scene, camera);
+   // renderer.render(scene, camera);
 }
 
 function animate() {
+
     delta = clock.getDelta();
     requestAnimationFrame(animate);
     controls.update(delta);
+    composer.render();
     render();
+
 }
 var modelList = [
             {
@@ -417,6 +417,7 @@ function clear() {
 
     if (view && renderer) {
         view.removeChild(renderer.domElement);
+        document.body.style.background = "#292121";
     }
 }
 
