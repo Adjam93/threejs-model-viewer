@@ -206,8 +206,6 @@ var loadFile = function (file) {
 
                 scene.add(model);
 
-                objects.push(model);
-
             }, false);
 
             if (reader.readAsBinaryString !== undefined) {
