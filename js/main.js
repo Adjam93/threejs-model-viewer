@@ -287,8 +287,10 @@ function removeModel() {
     scene.remove(model);
     scale = 1;
     numOfMeshes = 0;
-    //modelWithTexures = false;
-    //scene.remove(bound_box);
+    
+    if (ambient) {
+        scene.remove(ambient);
+    }
 
     camera.position.set(0, 0, 20); //Reset camera to initial position
     controls.reset(); //Reset controls, for when previous object has been moved around e.g. larger object = larger rotation
