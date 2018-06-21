@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Three.js Model Viewer</title>
 
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
@@ -14,6 +14,8 @@
 
     <link rel='stylesheet' href='css/spectrum.css' />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel='stylesheet' href='css/main_style.css' />
 
     <!--Three.js scripts-->
     <script src="js/three.js"></script>
@@ -39,13 +41,12 @@
     <script src="js/effects/ShaderPass.js"></script>
     <script src="js/effects/OutlinePass.js"></script>
     <script src="js/effects/SSAARenderPass.js"></script>
+    <script src="js/effects/FXAAShader.js"></script>
 
     <script src="js/jquery.nicescroll.js"></script>
     <script src="js/spectrum.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-
-    <link rel='stylesheet' href='css/main_style.css' />
 
     <script>
         $(function () {
@@ -55,7 +56,7 @@
                 max: 255,
                 value: 127  //Default value, Light colour of model set to median value (grey colour)
             });
-        });
+        }); 
     </script>
 
     <script id="vertexShader" type="x-shader/x-vertex">
@@ -118,7 +119,7 @@
                 </li>
 
                 <li class='dropdown'>
-                    <a href='#'><img src="images/ambient_icon.png" class="image" />Ambient Light</a>
+                    <a href='#'><img src="images/dir_light_icon.png" class="image" /> Lighting</a>
                     <ul>
                         <li><span>Ambient Light</span></li>
                         <li>
@@ -133,10 +134,22 @@
                         <li><div id="ambient_green"></div></li>
                         <li><span style="font-size: 12px">B</span></li>
                         <li><div id="ambient_blue"></div></li>
+
+                        <li><hr style="margin-top:15px"/></li>
+                        <li>Directional Light Colour</li>
+                     
+                            <li><span style="font-size: 12px">R</span></li>
+                            <li><div id="red"></div></li>
+                            <li><span style="font-size: 12px">G</span></li>
+                            <li><div id="green"></div></li>
+                            <li><span style="font-size: 12px">B</span></li>
+                            <li><div id="blue"></div></li>
+                        
                     </ul>
+                   
                 </li>
 
-                <li class='dropdown'>
+                <!--<li class='dropdown'>
                     <a href='#' id="dir_click"><img src="images/dir_light_icon.png" class="image" />Directional Light Colour</a>
                     <ul>
                         <li><span style="font-size: 12px">R</span></li>
@@ -146,7 +159,7 @@
                         <li><span style="font-size: 12px">B</span></li>
                         <li><div id="blue"></div></li>
                     </ul>
-                </li>
+                </li>-->
 
                 <li class='dropdown'>
                     <a href='#'><img src="images/wireframe_cube.png" class="image" />Wireframe View</a>
@@ -199,7 +212,7 @@
                 </li>
 
                 <li class='dropdown'>
-                    <a href='#'><img src="images/glow_icon.png" width="32" height="32" class="image" />Glow Outline</a>
+                    <a href='#'><img src="images/glowing.png" width="32" height="32" class="image" />Glow Outline</a>
                     <ul>
                         <li> <span>Glow Outline</span></li>
                         <li>
@@ -208,9 +221,26 @@
                                 <span class="toggle round"></span>
                             </label>
                         </li>
+
+                        <li><span style="font-size: 12px">edgeStrength</span></li>
+                        <li><div id="edgeStrength"></div></li>
+
                         <li> <span>Set Glow Colour</span></li>
                         <li><input type='text' class="glow_select" /></li>
                         <li><em id='basic-log'></em></li>
+                    </ul>
+                </li>
+
+                <li class='dropdown'>
+                    <a href='#'><img src="images/smoothed.png" width="32" height="32" class="image" />Smooth Model</a>
+                    <ul>
+                        <li> <span id="smooth-model" style="font-size:18px">Smooth Model</span></li>
+                        <li>
+                            <label class="switch">
+                                <input type="checkbox" id="smooth">
+                                <span class="toggle round"></span>
+                            </label>
+                        </li>
                     </ul>
                 </li>
 
@@ -234,7 +264,15 @@
                             </label>
                             <button class="qBtn" id="q_btn" title="Model Loading Help"><i class="fa fa-question-circle q_mark"></i></button>
                         </li>                  
-                        <li><input onclick="this.value=null;" type="file" id="obj_file" /></li>
+                        <li><input onclick="this.value=null;" type="file" id="obj_file" /></li>                       
+
+                        <li style="margin-top: 12px; margin-bottom: 16px;">
+                            <label for="modelPlusTexture" class="model-upload">
+                                <i style="margin-right: 5px;" class="fa fa-upload"></i> Model and Textures
+                            </label>                          
+                        </li>         
+                        <li><input id="modelPlusTexture" type="file" name="files[]" multiple="" class="model-upload"></li>
+
                         <li><button type="button" id="remove"><i style="margin-right: 5px;" class="fa fa-trash"></i> Remove file</button></li>
                         <li><output id="result" /></li>
                     </ul>
@@ -263,12 +301,12 @@
                     Some Models load with a different up axis, depending on the software used to create the model.
                     The model rotation section contains radio buttons to rotate the model in the x, y or z direction
                     in order to fix the orientation for viewing your model. Most often <b>X axis</b> rotation is the one required.
-                </p>  
+                </p> 
                 <p>
                     <h4>Model Loads in Black</h4>
                     <hr />
                     Some Models may load in black, try using the smooth model checkbox, to compute the vertex and face Normals.
-                </p>  
+                </p>   
             </div>
 
             <div id="disp_tmp_path"></div>
@@ -322,6 +360,11 @@
                             <span>Scale Up:</span> &nbsp;<button id="scale_up" style="margin:0 35px 0 0" type="button">+</button>
                             <span>Scale Down:</span> &nbsp;<button id="scale_down" type="button">-</button>
                         </li>
+                        <li>
+                            <label for="transform">Attach Transform Controls 
+                            <input class="check" type="checkbox" id="transform"> 
+                            </label>
+                        </li>
                     </ul>
                 </li>
 
@@ -373,7 +416,7 @@
         <div id="sampleMods">
             Sample Models
             <br />
-            <select id="scenes_list" onchange="selectModel();" ondblclick="selectModel();">
+            <select id="scenes_list" onchange="selectModel();">
                 <option>Crash Model (165 KB)</option>
                 <option>Bear Model (113 KB)</option>
                 <option>Car Model (1.33 MB)</option>
@@ -383,17 +426,14 @@
             </select>
             <br /><br />
           
-            <span id="smooth-model" style="font-size:18px">Smooth Model</span>
-            <label class="switch helper">
-                <input type="checkbox" id="smooth">
-                <span class="toggle grid round"></span>
-            </label>
+           
         </div>
 
         <script src="js/menu.js"></script>
         <script src="js/utils.js"></script>
         <script src="js/main.js"></script>
-        <script src="js/userModel.js"></script>
+        <!--<script src="js/userModelTextures.js"></script>-->
+        <script src="js/userModel.js"></script>     
     </div>
 
     <script src="js/ColourTheme.js"></script>
