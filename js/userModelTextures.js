@@ -124,6 +124,7 @@ var loadFiles = function (files) {
                     setPhong(child, modelDuplicate);
 
                     setCamera(model);
+                    setBoundBox(modelDuplicate);
                     setPolarGrid(model);
                     setGrid(modelDuplicate);
                     setAxis(model);
