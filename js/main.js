@@ -243,19 +243,9 @@ function initScene(index) {
             if (child instanceof THREE.Mesh) {
 
                 numOfMeshes++;
-                geometry = new THREE.Geometry().fromBufferGeometry(child.geometry);
-
-                if (geometry !== undefined) {
-                    //Dislay file name, number of vertices and faces info of model
-                    statsNode.innerHTML = 'Name of model/file: ' + '<span class="statsText">' + sceneInfo.name + '</span>'
-                               + '<br>'
-                               + 'Number of vertices: ' + '<span class="statsText">' + geometry.vertices.length + '</span>'
-                               + '<br>'
-                               + 'Number of faces: ' + '<span class="statsText">' + geometry.faces.length + '</span>'
-                               + '<br>'
-                               + 'Number of Meshes: ' + '<span class="statsText">' + numOfMeshes + '</span>';
-                }
-
+                var geometry = child.geometry;
+                stats(sceneInfo.name, geometry, numOfMeshes);
+                
                 child.material = materials.default_material;
 
                 var wireframe2 = new THREE.WireframeGeometry(child.geometry);
