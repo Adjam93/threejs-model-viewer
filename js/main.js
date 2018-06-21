@@ -150,17 +150,6 @@ function initScene(index) {
     controls.dampingFactor = 0.09;
     controls.rotateSpeed = 0.09;
 
-    transformControls = new THREE.TransformControls(camera, renderer.domElement);
-    transformControls.addEventListener('change', render);
-    scene.add(transformControls);
-
-    transformControls.addEventListener('mouseDown', function () {
-        controls.enabled = false;
-    });
-    transformControls.addEventListener('mouseUp', function () {
-        controls.enabled = true;
-    });
-
     window.addEventListener('keydown', function (event) {
 
         switch (event.keyCode) {
