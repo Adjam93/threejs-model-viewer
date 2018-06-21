@@ -4,13 +4,14 @@ var view = document.getElementById('main_viewer');
 if (!Detector.webgl) Detector.addGetWebGLMessage();
 
 var camera, camerHelper, scene, renderer, loader,
-    stats, controls, numOfMeshes = 0, model, sample_model, glowModel, wireframe, mat, scale, delta;
+    stats, controls, transformControls, numOfMeshes = 0, model, modelDuplicate, sample_model, wireframe, mat, scale, delta;
 
-var initialMaterial;
 var modelLoaded = false;
+var modelWithTexures = false;
 var bg_Texture = false;
 
-var glow_value, selectedObject, composer, effectFXAA, outlinePass, ssaaRenderPass;
+var glow_value, selectedObject, composer, effectFXAA, position, outlinePass, ssaaRenderPass;
+var clock = new THREE.Clock();
 
 var ambient, directionalLight, directionalLight2, directionalLight3, bg_colour;
 var backgroundScene, backgroundCamera, backgroundMesh;
@@ -36,17 +37,19 @@ var statsNode = document.getElementById('stats');
 //http://free-tutorials.org/shader-x-ray-effect-with-three-js/
 var materials = {
     default_material: new THREE.MeshLambertMaterial({ side: THREE.DoubleSide }),
+    default_material2: new THREE.MeshLambertMaterial({ side: THREE.DoubleSide }),
     wireframeMaterial: new THREE.MeshPhongMaterial({
         side: THREE.DoubleSide,
         wireframe: true, 
         shininess: 100,
         specular: 0x000, emissive: 0x000,
-        shading: THREE.SmoothShading, depthWrite: true, depthTest: true
+        flatShading: false, depthWrite: true, depthTest: true
     }),
+    wireframeMaterial2: new THREE.LineBasicMaterial({ wireframe: true, color: 0xffffff }),
     wireframeAndModel: new THREE.LineBasicMaterial({ color: 0xffffff }),
     phongMaterial: new THREE.MeshPhongMaterial({
         color: 0x555555, specular: 0xffffff, shininess: 10,
-        shading: THREE.SmoothShading, side: THREE.DoubleSide // map: texture
+        flatShading: false, side: THREE.DoubleSide
     }),
     xrayMaterial: new THREE.ShaderMaterial({
         uniforms: {
@@ -61,7 +64,7 @@ var materials = {
 };
 
 var clock = new THREE.Clock();
-//var winDims = [window.innerWidth * 0.8, window.innerHeight * 0.89]; //old size of renderer
+var winDims = [window.innerWidth * 0.8, window.innerHeight * 0.89]; //size of renderer
 
 function onload() {
 
@@ -73,11 +76,12 @@ function onload() {
 function initScene(index) {
 
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 500000);
 
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 500000);
     camera.position.set(0, 0, 20);
 
     //Setup renderer
+    //renderer = new THREE.CanvasRenderer({ alpha: true });
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight)
@@ -100,10 +104,13 @@ function initScene(index) {
                 document.exitFullscreen();
             } else if (document.msExitFullscreen) {
                 document.msExitFullscreen();
+                //renderer.setSize(winDims[0], winDims[1]); //Reset renderer size on fullscreen exit
             } else if (document.mozCancelFullScreen) {
                 document.mozCancelFullScreen();
+                //renderer.setSize(winDims[0], winDims[1]);
             } else if (document.webkitExitFullscreen) {
                 document.webkitExitFullscreen();
+               // renderer.setSize(winDims[0], winDims[1]);
             }
         }
     }
@@ -111,7 +118,7 @@ function initScene(index) {
     document.getElementById('fullscreenBtn').addEventListener('click', function () {
         toggleFullscreen();
     });
-
+  
     ambient = new THREE.AmbientLight(0x404040);
     $('#ambient_light').change(function () {
         if (amb.checked) {
@@ -143,6 +150,36 @@ function initScene(index) {
     controls.dampingFactor = 0.09;
     controls.rotateSpeed = 0.09;
 
+    transformControls = new THREE.TransformControls(camera, renderer.domElement);
+    transformControls.addEventListener('change', render);
+    scene.add(transformControls);
+
+    transformControls.addEventListener('mouseDown', function () {
+        controls.enabled = false;
+    });
+    transformControls.addEventListener('mouseUp', function () {
+        controls.enabled = true;
+    });
+
+    window.addEventListener('keydown', function (event) {
+
+        switch (event.keyCode) {
+
+            case 82: // R key pressed - set rotate mode
+                transformControls.setMode("rotate");
+                break;
+
+            case 84: // T key pressed - set translate mode
+                transformControls.setMode("translate");
+                break;
+
+            case 83: // S key pressed - set scale mode
+                transformControls.setMode("scale");
+                break;
+        }
+
+    });
+
     //Colour changer, to set background colour of renderer to user chosen colour
     $(".bg_select").spectrum({
         color: "#fff",
@@ -167,11 +204,12 @@ function initScene(index) {
 
     var outputPass = new THREE.ShaderPass(THREE.CopyShader);
     outputPass.renderToScreen = true;
-
+    
     composer = new THREE.EffectComposer(renderer);
     composer.addPass(ssaaRenderPass);
     composer.addPass(outlinePass);
     composer.addPass(outputPass);
+    //composer.addPass(effectFXAA);
 
     /*LOAD SAMPLE MODELS*/
     var sceneInfo = modelList[index]; //index from array of sample models in html select options
@@ -254,6 +292,15 @@ function initScene(index) {
 
     }, onProgress, onError);
 
+
+    $('#transform').on('change', function () {
+        if (transform.checked) {
+            transformControls.attach(sample_model);
+        } else {
+            transformControls.detach(scene);
+        }
+    });
+
 }
 
 function removeModel() {
@@ -261,6 +308,8 @@ function removeModel() {
     scene.remove(model);
     scale = 1;
     numOfMeshes = 0;
+    //modelWithTexures = false;
+    //scene.remove(bound_box);
 
     camera.position.set(0, 0, 20); //Reset camera to initial position
     controls.reset(); //Reset controls, for when previous object has been moved around e.g. larger object = larger rotation
@@ -271,7 +320,7 @@ function removeModel() {
     amb.checked = false; rot1.checked = false; wire.checked = false;
     model_wire.checked = false; phong.checked = false; xray.checked = false;
     glow.checked = false; grid.checked = false; polar_grid.checked = false;
-    axis.checked = false; bBox.checked = false; smooth.checked = false;//Uncheck any checked boxes
+    axis.checked = false; bBox.checked = false; smooth.checked = false; smooth.disabled = false;//Uncheck any checked boxes
 
     document.getElementById('smooth-model').innerHTML = "Smooth Model";
 
@@ -354,7 +403,6 @@ function getColours(r, g, b) {
 function render() {
 
     setColours();
-
    // renderer.render(scene, camera);
 }
 
