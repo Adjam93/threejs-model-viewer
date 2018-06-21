@@ -34,7 +34,7 @@ body {
     font-size:14px;   
     color:white;      
 }
-
+  
 #collapse_side {
     position: absolute;
     left: 20%;
@@ -60,7 +60,7 @@ body {
     border-radius: 5px;
     font-size: 30px;      
 }
-        
+      
 #fullscreen {
     position: absolute;
     right: 6px;
@@ -80,7 +80,7 @@ button:hover{
     float: right;  
 }
 
-#red, #green, #blue, #ambient_red, #ambient_green, #ambient_blue, #shine{
+#red, #green, #blue, #ambient_red, #ambient_green, #ambient_blue, #shine, #edgeStrength{
     width:98%;      
     margin-top:4px;
     font-size: 7.5px;
@@ -278,7 +278,6 @@ input:checked + .grid:before {
 }
 
 .bottom_menu_item{
-    /*margin: 50px 0px 0px 0px; top, right, bottom, left*/
     width: 100%;
     margin: 0;
     margin-top: 0.5px;
@@ -324,10 +323,6 @@ input:checked + .grid:before {
      border: 2px solid #ffffff;
 }
 
-/*.rotateButton:hover {
-    background-color:#239450;
-}*/
-
 .resetRotateButton {
     background-color: #DD3D0C;
     margin-top: 5px;
@@ -355,7 +350,7 @@ input:checked + .grid:before {
     background-color: #4d4dff;
 }
 
-#obj_file {
+#obj_file, #modelPlusTexture{
     display: none;
 }
 .model-upload, #remove {
@@ -367,14 +362,18 @@ input:checked + .grid:before {
     background: #4B5F83;
 }
 
-.model-upload:hover, #remove:hover{
+.model-upload:hover{
      background: #009999;
 }
 
  #remove {
     padding: 9px 12.5px;
     font-size: 14px;
+    background: #b90a0a;
 }
+ #remove:hover{
+     background: #e23636;
+ }
 
 .qBtn{ 
     background: #1d1e1e;
