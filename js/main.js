@@ -6,7 +6,7 @@ if (!Detector.webgl) Detector.addGetWebGLMessage();
 var camera, camerHelper, scene, renderer, loader,
     stats, controls, transformControls, numOfMeshes = 0, model, modelDuplicate, sample_model, wireframe, mat, scale, delta;
 
-var modelLoaded = false;
+var modelLoaded = false, sample_model_loaded = false;
 var modelWithTexures = false;
 var bg_Texture = false;
 
@@ -28,6 +28,7 @@ var polar_grid = document.getElementById('polar_grid');
 var axis = document.getElementById('axis');
 var bBox = document.getElementById('bBox');
 
+var transform = document.getElementById('transform');
 var smooth = document.getElementById('smooth');
 var outline = document.getElementById('outline');
 
@@ -149,6 +150,17 @@ function initScene(index) {
     controls.enableDamping = true;
     controls.dampingFactor = 0.09;
     controls.rotateSpeed = 0.09;
+
+    transformControls = new THREE.TransformControls(camera, renderer.domElement);
+    transformControls.addEventListener('change', render);
+    scene.add(transformControls);
+
+    transformControls.addEventListener('mouseDown', function () {
+        controls.enabled = false;
+    });
+    transformControls.addEventListener('mouseUp', function () {
+        controls.enabled = true;
+    });
 
     window.addEventListener('keydown', function (event) {
 
@@ -272,14 +284,19 @@ function initScene(index) {
     }, onProgress, onError);
 
 
-    $('#transform').on('change', function () {
+   $('#transform').on('change', function () {
         if (transform.checked) {
-            transformControls.attach(sample_model);
+            if (modelLoaded) {
+                transformControls.attach(model);
+            }
+            else if(sample_model_loaded) {
+                transformControls.attach(sample_model);
+            }
+            
         } else {
             transformControls.detach(scene);
         }
     });
-
 }
 
 function removeModel() {
@@ -301,7 +318,10 @@ function removeModel() {
     amb.checked = false; rot1.checked = false; wire.checked = false;
     model_wire.checked = false; phong.checked = false; xray.checked = false;
     glow.checked = false; grid.checked = false; polar_grid.checked = false;
-    axis.checked = false; bBox.checked = false; smooth.checked = false; smooth.disabled = false;//Uncheck any checked boxes
+    axis.checked = false; bBox.checked = false; smooth.checked = false; 
+    transform.checked = false, smooth.disabled = false; //Uncheck any checked boxes
+    
+    transformControls.detach(scene);
 
     document.getElementById('smooth-model').innerHTML = "Smooth Model";
 
