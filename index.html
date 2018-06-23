@@ -339,12 +339,23 @@
                 </li>
 
                 <li class='dropdown'>
-                    <a href='#'><img src="images/scale.png" class="image" />Scale Model</a>
+                    <a href='#'><img src="images/scale.png" class="image" />Transform Model</a>
                     <ul>
-                        <li style="text-align:center; font-size: 15px">
+                        <li style="margin-left:25px; font-size: 15px">
+                            <label for="transform">
+                                Attach Transform Controls:
+                                <label class="switch helper">
+                                    <input type="checkbox" id="transform">
+                                    <span class="toggle grid round"></span>
+                                </label>
+                            </label>
+                        </li>
+
+                        <li style="text-align:center; margin-top:8px;font-size: 15px">
                             <span>Scale Up:</span> &nbsp;<button id="scale_up" style="margin:0 35px 0 0" type="button">+</button>
                             <span>Scale Down:</span> &nbsp;<button id="scale_down" type="button">-</button>
-                        </li>      
+                        </li>
+                        
                     </ul>
                 </li>
 
