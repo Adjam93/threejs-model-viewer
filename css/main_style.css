@@ -129,7 +129,9 @@ button:hover{
     margin-left:10px;
 }
 
-.switch input {display:none;} /*hide default checkbox*/
+.switch input {
+	display:none;
+} 
 
 .toggle {
     position: absolute;
@@ -341,7 +343,7 @@ input:checked + .grid:before {
     font-family: Arial;
     color: #ffffff;
     font-size: 17px;
-    padding: 6px 14px 6px 14px;
+    padding: 4px 12px 4px 12px;
     border: solid #000033 4px;
     text-decoration: none;
 }
