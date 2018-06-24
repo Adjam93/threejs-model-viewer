@@ -336,6 +336,12 @@ input:checked + .grid:before {
     background-color: #B43008;
 }
 
+#transformKey {
+    display: none; 
+    margin-left:25px; 
+    font-size: 15px
+}
+
 #scale_up, #scale_down{
     background-color: #000099;
     border-radius: 7px;
