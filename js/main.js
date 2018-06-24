@@ -284,8 +284,10 @@ function initScene(index) {
     }, onProgress, onError);
 
 
-   $('#transform').on('change', function () {
+    $('#transform').on('change', function () {
+        
         if (transform.checked) {
+            document.getElementById('transformKey').style.display = 'block';
             if (modelLoaded) {
                 transformControls.attach(model);
             }
@@ -294,6 +296,7 @@ function initScene(index) {
             }
             
         } else {
+            document.getElementById('transformKey').style.display = 'none';
             transformControls.detach(scene);
         }
     });
