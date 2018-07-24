@@ -307,6 +307,8 @@ function removeModel() {
     scene.remove(model);
     scale = 1;
     numOfMeshes = 0;
+    modelLoaded = false;
+    modelWithTexures = false;
     
     if (ambient) {
         scene.remove(ambient);
