@@ -104,8 +104,7 @@ $('#glow_check').on('change', function () {
 
 function setWireFrame(mod) {
 
-    if (modelWithText
-        ures) {
+    if (modelWithTextures) {
 
         $('#wire_check').on('change', function () {
 
