@@ -4,7 +4,7 @@ An application using the Three.js library to allow user to load model files and 
 <b>Loading Models:</b>
 - Choice of inputs, either load model or load model + textures
 - Models and textures can be dragged and dropped onto the viewer
-- Current formats supported: .obj or obj+mtl(and textures), .dae or dae+textures and .stl
+- Current formats supported: <b>.obj</b> or obj+mtl(and textures), <b>.dae</b> or dae+textures and <b>.stl</b>
 - If loading a model and textures, make sure the model file and texture files are in the same folder on your system
 
 <b>Features:</b>
