@@ -68,7 +68,6 @@ var loadFile = function (file) {
             scene.remove(sample_model);
             removeModel();
             modelLoaded = true;
-            modelWithTexures = false;
 
             reader.addEventListener( 'load', function ( event ) {
 
