@@ -1,4 +1,4 @@
-﻿var modelAndTextures = document.getElementById('modelPlusTexture');
+var modelAndTextures = document.getElementById('modelPlusTexture');
 
 modelAndTextures.addEventListener('change', function (event) {
 
@@ -78,7 +78,7 @@ var loadFiles = function (files) {
 
             var dae = collada.scene;
             model = collada.scene;
-            modelWithTexures = true;
+            modelWithTextures = true;
 
             console.log(model);
             var objectHasUvs = false;
@@ -158,7 +158,7 @@ var loadFiles = function (files) {
             loader.load(obj_path, function (obj) {
 
                 model = obj;
-                modelWithTexures = true;
+                modelWithTextures = true;
 
                 model.traverse(function (child) {
                     if (child instanceof THREE.Mesh) {
