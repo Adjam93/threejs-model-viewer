@@ -104,7 +104,8 @@ $('#glow_check').on('change', function () {
 
 function setWireFrame(mod) {
 
-    if (modelWithTexures) {
+    if (modelWithText
+        ures) {
 
         $('#wire_check').on('change', function () {
 
@@ -161,7 +162,7 @@ function setWireframeAndModel(mod) {
 
         $('input.check').not(this).prop('checked', false);
 
-        if (modelWithTexures) {
+        if (modelWithTextures) {
             if (mod.material.length > 1) {
                 for (var i = 0; i < mod.material.length; i++) {
 
@@ -243,7 +244,7 @@ function setPhong(mod, modDuplicate) {
 
         $('input.check').not(this).prop('checked', false); //Uncheck any other checked inputs with class=check
 
-            if (modelWithTexures) {
+            if (modelWithTextures) {
 
                 if (modDuplicate !== undefined) {
 
@@ -275,7 +276,7 @@ function setXray(mod, modDuplicate) {
         
             $('input.check').not(this).prop('checked', false);
 
-            if (modelWithTexures) {
+            if (modelWithTextures) {
 
                 if (modDuplicate !== undefined) {
 
