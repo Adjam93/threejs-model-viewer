@@ -1,11 +1,14 @@
 # Three.js-Model-Viewer
 An application using the Three.js library to allow user to load model files and view them online with multiple viewing options.
 
-<b>Viewer Currently Supports .obj, .stl and .dae (collada) file formats</b>
+<b>Loading Models:</b>
+- Choice of inputs, either load model or load model + textures
+- Models and textures can be dragged and dropped onto the viewer
+- Current formats supported: .obj or obj+mtl(and textures), .dae or dae+textures and .stl
+- If loading a model and textures, make sure the model file and texture files are in the same folder on your system
 
 <b>Features:</b>
 - View sample models from dropdown list
-- Load/Drop file into the 3D scene
 - View model information (name of model, number of vertices and faces)
 - Add ambient light and alter the colour
 - Alter the colour of the directional Ligt
@@ -13,14 +16,14 @@ An application using the Three.js library to allow user to load model files and 
 - Apply phong shading mode and increase/decrease the shininess level
 - View model in x-ray
 - Apply glow outline pass to the model and set the edge colour of the glow
-- Set background colour of the renderer or set selected image to be the background
+- Set background colour of the renderer
 - Auto-rotate the model and adjust the rotation speed
+- Add transform controls (when selected, press S:scale, T:translate and R:rotate)
 - Scale the model up and down
 - Add view helpers such as bounding box, square/circular grid underneath model and an axis
 
 <b>Potential Features:</b>
 - Load more formats e.g. FBX, GLTF, etc.
-- Allow user to load model with material files and images (current test is working - needs to be implemented into main project)
 - ZIP file support
 
 <h2><a href="https://adjam93.github.io/threejs-model-viewer/" target="_blank">View the Project Online</a></h2>
