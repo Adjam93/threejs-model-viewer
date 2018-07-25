@@ -104,40 +104,46 @@ $('#glow_check').on('change', function () {
 
 function setWireFrame(mod) {
 
-    $('#wire_check').on('change', function () {
+    if (modelWithTexures) {
 
-        $('input.check').not(this).prop('checked', false);
+        $('#wire_check').on('change', function () {
 
-        if (modelWithTexures) {
-            if (wire.checked) {
+                $('input.check').not(this).prop('checked', false);
 
-                materials.wireframeAndModel.visible = false;
+                if (wire.checked) {
 
-                if (mod.material.length > 1) {
-                    for (var i = 0; i < mod.material.length; i++) {
+                    materials.wireframeAndModel.visible = false;
+                     if (mod.material.length > 1) {
+                         for (var i = 0; i < mod.material.length; i++) {
+ 
+                             mod.material[i].wireframe = true;
+                         }
+                     }
+                     else {
+                         mod.material.wireframe = true;
+                     }
 
-                        mod.material[i].wireframe = true;
-                    }
                 }
                 else {
-                    mod.material.wireframe = true;
-                }            
-                
-            }
-            else {
-                if (mod.material.length > 1) {
-                    for (var i = 0; i < mod.material.length; i++) {
-
-                        mod.material[i].wireframe = false;
-                    }
+                    if (mod.material.length > 1) {
+                         for (var i = 0; i < mod.material.length; i++) {
+ 
+                             mod.material[i].wireframe = false;
+                         }
+                     }
+                     else {
+                        mod.material.wireframe = false;
+                     }
                 }
-                else {
-                    mod.material.wireframe = false;
-                }          
-            }
+            });
+      
         }
-        //model without textures
-        else {
+    else {
+
+        $('#wire_check').on('change', function () {
+
+            $('input.check').not(this).prop('checked', false);
+
             if (wire.checked) {
                 materials.wireframeAndModel.visible = false;
                 mod.material = materials.wireframeMaterial;
@@ -145,9 +151,8 @@ function setWireFrame(mod) {
             else {
                 mod.material = materials.default_material;
             }
-        }
-       
-    });
+        });
+    }
 }
 
 function setWireframeAndModel(mod) {
