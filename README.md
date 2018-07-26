@@ -24,6 +24,7 @@ An application using the Three.js library to allow user to load model files and 
 
 <b>Potential Features:</b>
 - Load more formats e.g. FBX, GLTF, etc.
+- Support models with animations and morph targets
 - ZIP file support
 
 <h2><a href="https://adjam93.github.io/threejs-model-viewer/" target="_blank">View the Project Online</a></h2>
