@@ -80,7 +80,7 @@ button:hover{
     float: right;  
 }
 
-#red, #green, #blue, #ambient_red, #ambient_green, #ambient_blue, #shine, #edgeStrength{
+#red, #green, #blue, #ambient_red, #ambient_green, #ambient_blue, #shine, #point_light, #edgeStrength{
     width:98%;      
     margin-top:4px;
     font-size: 7.5px;
@@ -91,6 +91,9 @@ button:hover{
     float:right;
     font-size: 7.5px;
 }
+
+#shine .ui-slider-handle, #point_light .ui-slider-handle,
+#edgeStrength .ui-slider-handle  { font-size: 10px; border-radius: 34px; outline: none; }
 
 #red .ui-slider-range { background: #ef2929; }
 #red .ui-slider-handle { border-color: #ef2929;  border-radius: 34px; outline: none;}
