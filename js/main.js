@@ -13,7 +13,7 @@ var bg_Texture = false;
 var glow_value, selectedObject, composer, effectFXAA, position, outlinePass, ssaaRenderPass;
 var clock = new THREE.Clock();
 
-var ambient, directionalLight, directionalLight2, directionalLight3, bg_colour;
+var ambient, directionalLight, directionalLight2, directionalLight3, pointLight, bg_colour;
 var backgroundScene, backgroundCamera, backgroundMesh;
 
 var amb = document.getElementById('ambient_light');
@@ -146,6 +146,11 @@ function initScene(index) {
     var ambientLight = new THREE.AmbientLight(0x808080, 0.2); //Grey colour, low intensity
     scene.add(ambientLight);
 
+    pointLight = new THREE.PointLight(0xcccccc, 0.5);
+    camera.add(pointLight);
+
+    scene.add(camera);
+    
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.09;
@@ -313,6 +318,9 @@ function removeModel() {
     if (ambient) {
         scene.remove(ambient);
     }
+    
+    $('#point_light').slider("value", 0.5);
+    pointLight.intensity = 0.5;
 
     camera.position.set(0, 0, 20); //Reset camera to initial position
     controls.reset(); //Reset controls, for when previous object has been moved around e.g. larger object = larger rotation
