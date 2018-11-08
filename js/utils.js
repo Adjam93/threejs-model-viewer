@@ -405,6 +405,7 @@ $("#shine").slider({
     }
 });
 
+//Strength of glow outine
 $("#edgeStrength").slider({
     orientation: "horizontal",
     min: 1,
@@ -418,6 +419,20 @@ $("#edgeStrength").slider({
     }
 });
 
+//PointLight intensity slider
+$("#point_light").slider({
+    orientation: "horizontal",
+    min: 0,
+    max: 1,
+    step: 0.1,
+    value: 0.5,
+    slide: function (event, ui) {
+        pointLight.intensity = ui.value;
+    },
+    change: function (event, ui) {
+        pointLight.intensity = ui.value;
+    }
+});
 
 //Set colour of glow model to value from colour
 $(".glow_select").spectrum({
