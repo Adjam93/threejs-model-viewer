@@ -199,24 +199,24 @@ function initScene(index) {
     });
 
     // postprocessing    
-    ssaaRenderPass = new THREE.SSAARenderPass(scene, camera);
-    ssaaRenderPass.unbiased = true;
-    ssaaRenderPass.clearColor = 0x292121;
-    ssaaRenderPass.clearAlpha = 1;
+    var renderPass = new THREE.RenderPass( scene, camera );
+
+    var fxaaPass = new THREE.ShaderPass( THREE.FXAAShader );
+    var pixelRatio = renderer.getPixelRatio();
+
+    fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( window.innerWidth * pixelRatio );
+    fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( window.innerHeight * pixelRatio );
+    fxaaPass.renderToScreen = true;
 
     outlinePass = new THREE.OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);   
     outlinePass.edgeStrength = 1.5; 
-    outlinePass.edgeGlow = 2; //model glow outline
+    outlinePass.edgeGlow = 2;
 
-    var outputPass = new THREE.ShaderPass(THREE.CopyShader);
-    outputPass.renderToScreen = true;
-    
-    composer = new THREE.EffectComposer(renderer);
-    composer.addPass(ssaaRenderPass);
+    composer = new THREE.EffectComposer( renderer );
+    composer.addPass( renderPass );
     composer.addPass(outlinePass);
-    composer.addPass(outputPass);
-    //composer.addPass(effectFXAA);
-
+    composer.addPass( fxaaPass );
+    
     /*LOAD SAMPLE MODELS*/
     var sceneInfo = modelList[index]; //index from array of sample models in html select options
     loader = new THREE.OBJLoader();
