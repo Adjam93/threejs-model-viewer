@@ -54,7 +54,7 @@ var materials = {
     wireframeAndModel: new THREE.LineBasicMaterial({ color: 0xffffff }),
     phongMaterial: new THREE.MeshPhongMaterial({
         color: 0x555555, specular: 0xffffff, shininess: 10,
-        flatShading: false, side: THREE.DoubleSide
+        flatShading: false, side: THREE.DoubleSide, skinning: true
     }),
     xrayMaterial: new THREE.ShaderMaterial({
         uniforms: {
