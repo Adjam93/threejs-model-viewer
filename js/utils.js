@@ -241,7 +241,12 @@ function setPhong(mod, originalMat) {
 
     $('#phong_check').on('change', function () {
 
-        phong.checked ? mod.material = materials.phongMaterial : mod.material = originalMat;
+       if (modelWithTextures) {
+            phong.checked ? mod.material = materials.phongMaterial : mod.material = originalMat;
+          }
+          else{
+              phong.checked ? mod.material = materials.phongMaterial : mod.material = materials.default_material;
+          }
      });
 
 }
@@ -250,7 +255,12 @@ function setXray(mod, originalMat) {
 
     $('#xray_check').on('change', function () {
         
-       xray.checked ? mod.material = materials.xrayMaterial : mod.material = originalMat;
+       if (modelWithTextures) {
+          xray.checked ? mod.material = materials.xrayMaterial : mod.material = originalMat;
+        }
+        else{
+            xray.checked ? mod.material = materials.xrayMaterial : mod.material = materials.default_material;
+        }
     });
 }
 
