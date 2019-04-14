@@ -169,10 +169,6 @@ var loadFiles = function (files) {
                         var geometry = child.geometry;
                         stats(obj_path, geometry, numOfMeshes);
           
-                        modelDuplicate = new THREE.Mesh(geometry, materials.default_material2);
-                        modelDuplicate.material.visible = false;
-                        model.add(modelDuplicate);
-
                         var wireframe2 = new THREE.WireframeGeometry(child.geometry);
                         var edges = new THREE.LineSegments(wireframe2, materials.wireframeAndModel);
                         materials.wireframeAndModel.visible = false;
@@ -180,16 +176,15 @@ var loadFiles = function (files) {
 
                         setWireFrame(child);
                         setWireframeAndModel(child);
-
-                        setPhong(child, modelDuplicate);
-                        setXray(child, modelDuplicate);
                         
+                        var originalMaterial = child.material;
+                        setXray(child, originalMaterial);
+                        setPhong(child, originalMaterial);                
 
                     }
                 });
 
                 setCamera(model);
-
                 setSmooth(model);
 
                 model.position.set(0, 0, 0);
