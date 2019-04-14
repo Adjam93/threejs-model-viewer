@@ -237,65 +237,19 @@ function setSmooth(mod) {
 
 }
     
-function setPhong(mod, modDuplicate) {
+function setPhong(mod, originalMat) {
 
     $('#phong_check').on('change', function () {
 
-        $('input.check').not(this).prop('checked', false); //Uncheck any other checked inputs with class=check
-
-            if (modelWithTextures) {
-
-                if (modDuplicate !== undefined) {
-
-                    if (phong.checked) {
-                        modDuplicate.material = materials.phongMaterial;
-                        modDuplicate.material.visible = true;
-                        mod.visible = false;
-                    }
-                    else {
-                        modDuplicate.material = materials.default_material2;
-                        modDuplicate.material.visible = false;
-                        mod.visible = true;
-                    }
-
-                }
-            }
-        
-            else {
-                phong.checked ? mod.material = materials.phongMaterial : mod.material = materials.default_material;
-        }
-        
-    });
+     phong.checked ? mod.material = materials.phongMaterial : mod.material = originalMat;
 
 }
 
-function setXray(mod, modDuplicate) {
+function setXray(mod, originalMat) {
 
     $('#xray_check').on('change', function () {
         
-            $('input.check').not(this).prop('checked', false);
-
-            if (modelWithTextures) {
-
-                if (modDuplicate !== undefined) {
-
-                    if (xray.checked) {
-                        modDuplicate.material = materials.xrayMaterial;
-                        modDuplicate.material.visible = true;
-                        mod.visible = false;
-                    }
-                    else {
-                        modDuplicate.material = materials.default_material2;
-                        modDuplicate.material.visible = false;
-                        mod.visible = true;
-                    }
-                }
-            }
-             else {
-                  xray.checked ? mod.material = materials.xrayMaterial : mod.material = materials.default_material;
-              }
-          
-        });
+      xray.checked ? mod.material = materials.xrayMaterial : mod.material = originalMat;
 }
 
 var bound_box;
