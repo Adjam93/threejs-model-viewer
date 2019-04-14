@@ -428,7 +428,12 @@ function animate() {
 
     delta = clock.getDelta();
     requestAnimationFrame(animate);
+    
+    if (mixer) {
+        mixer.update(delta);
+    }
     controls.update(delta);
+    
     composer.render();
     render();
 
