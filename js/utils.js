@@ -241,7 +241,8 @@ function setPhong(mod, originalMat) {
 
     $('#phong_check').on('change', function () {
 
-     phong.checked ? mod.material = materials.phongMaterial : mod.material = originalMat;
+        phong.checked ? mod.material = materials.phongMaterial : mod.material = originalMat;
+     });
 
 }
 
@@ -249,7 +250,8 @@ function setXray(mod, originalMat) {
 
     $('#xray_check').on('change', function () {
         
-      xray.checked ? mod.material = materials.xrayMaterial : mod.material = originalMat;
+       xray.checked ? mod.material = materials.xrayMaterial : mod.material = originalMat;
+    });
 }
 
 var bound_box;
