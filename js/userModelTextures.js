@@ -76,12 +76,10 @@ var loadFiles = function (files) {
         var collada_loader = new THREE.ColladaLoader(manager);
         collada_loader.load(dae_path, function (collada) {
 
-            var dae = collada.scene;
             model = collada.scene;
             modelWithTextures = true;
 
             var anims = collada.animations
-
             addAnimation( model, anims );
             animControl( model );
             playAllAnimation(anims);
@@ -90,12 +88,20 @@ var loadFiles = function (files) {
 
             model.traverse(function (child) {
 
-                if (child.isMesh || child.isSkinnedMesh) {
+                if (child.isMesh) {
+                    
+                    if (child.material.length > 1) {
+                        for (var i = 0; i < child.material.length; i++) {
 
-                    if (child.material) {
-                        child.material.side = THREE.DoubleSide;
-                        child.material.skinning = false;
+                            child.material[i].side = THREE.DoubleSide;
+                            //child.material[i].skinning = false;
+                        }
                     }
+                    else {
+                        child.material.side = THREE.DoubleSide;
+                       // child.material.skinning = false;
+                    }
+
 
                     numOfMeshes++;
                     var geometry = child.geometry;
