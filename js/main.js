@@ -349,6 +349,8 @@ function removeModel() {
     $('#shine').slider("value", 10); //Set phong shine level back to initial
 
     $('input[name="rotate"]').prop('checked', false); //uncheck rotate x, y or z checkboxes
+    
+    animsDiv.style.display = "none"; //Hide animation <div>
 }
 
 $('#remove').click(function () {
