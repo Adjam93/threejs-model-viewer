@@ -34,6 +34,10 @@ var outline = document.getElementById('outline');
 
 var statsNode = document.getElementById('stats');
 
+//ANIMATION GLOBALS
+var animations = {}, animationsSelect = document.getElementById("animationSelect"),
+animsDiv = document.getElementById("anims"), mixer, currentAnimation, actions = {};
+
 //X-RAY SHADER MATERIAL
 //http://free-tutorials.org/shader-x-ray-effect-with-three-js/
 var materials = {
