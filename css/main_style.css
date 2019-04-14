@@ -47,6 +47,23 @@ body {
     display: none;
 }
 
+.animBtn{
+    box-shadow:inset 0px 1px 0px 0px #030100;
+    background-color:#2c3e50;
+    border-radius:3px;
+    border:1px solid #ffffff;
+    font-family: 'Titillium Web', sans-serif; 
+    cursor:pointer;
+    color:#ffffff;
+    font-size:13px;
+    padding: 8px;
+    margin-right: 10px;
+}
+
+#stop{
+    background-color: #e23636;
+}
+
 /* Reset Select */
 select {
     -webkit-appearance: none;
