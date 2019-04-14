@@ -107,38 +107,24 @@ var loadFiles = function (files) {
                     var geometry = child.geometry;
                     stats(dae_path, geometry, numOfMeshes);
 
-                    const materials2 = Array.isArray(child.material)
-                    console.log(materials2);                               
-                    console.log(child.material.length);
-                   
                     var wireframe2 = new THREE.WireframeGeometry(child.geometry);
                     var edges = new THREE.LineSegments(wireframe2, materials.wireframeAndModel);
                     materials.wireframeAndModel.visible = false;
 
                     model.rotation.set(0, 0, 0);
 
-                    if (Array.isArray(child.material)) {
-                        modelDuplicate = child.clone();
-                        modelDuplicate.add(edges);
-                    }
-                    else {
-                        modelDuplicate = new THREE.Mesh(child.geometry, materials.default_material2);
-                        model.add(edges);
-                    }
                     
-                    modelDuplicate.material.visible = false;
-                    model.add(modelDuplicate);
-
                     setWireFrame(child);
                     setWireframeAndModel(child);
-                    setXray(child, modelDuplicate);
-                    setPhong(child, modelDuplicate);
-
-                    setCamera(model);
-                    setBoundBox(modelDuplicate);
-                    setPolarGrid(model);
-                    setGrid(modelDuplicate);
-                    setAxis(model);
+                    
+                    var originalMaterial = child.material;
+                    setXray(child, originalMaterial);
+                    setPhong(child, originalMaterial);
+                    
+                    setBoundBox(child);
+                    setGrid(child);
+                    setPolarGrid(child);
+                    setAxis(child);
                     
                     smooth.disabled = true;
                     document.getElementById('smooth-model').innerHTML = "Smooth Model (Disabled)";
@@ -148,6 +134,7 @@ var loadFiles = function (files) {
 
             model.position.set(0, 0, 0);
 
+            setCamera(model);
             scaleUp(model); scaleDown(model);
 
             fixRotation(model);
