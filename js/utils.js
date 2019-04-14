@@ -517,3 +517,105 @@ function resetRotation(mod) {
         $('input[name="rotate"]').prop('checked', false);
     });
 }
+
+/*Animation Controls */
+
+function addAnimation( object, model_animations ) {
+
+    animations[ object.uuid ] = model_animations;
+
+    if(model_animations.length > 0 ){
+        animsDiv.style.display = "block";
+    }
+    else{
+        animsDiv.style.display = "none";
+    }
+}
+
+function animControl( object ) {
+
+    var uuid = object !== null ? object.uuid : '';
+    var anims = animations[ uuid ];
+
+    if ( anims !== undefined ) {
+
+        mixer = new THREE.AnimationMixer( object );
+        var options = {};
+        for ( var animation of anims ) {
+
+            options[ animation.name ] = animation.name;
+
+            var action = mixer.clipAction( animation );
+            actions[ animation.name ] = action;
+        }
+
+        setOptions( options );
+    }
+}
+
+function playAnimation() {
+
+    currentAnimation = actions[ animationsSelect.value ];
+    if ( currentAnimation !== undefined ) {
+
+        stopAnimations();
+        currentAnimation.play();
+      //  updateAnimation();
+
+    }
+}
+
+function playAllAnimation(anims) {
+
+    if(anims !== undefined){
+        document.getElementById("playAll").addEventListener("click", function(){
+            anims.forEach(function (clip) {
+                mixer.clipAction(clip).reset().play();
+            });
+        });
+    }
+}       
+
+function stopAnimations() {
+
+    if ( mixer !== undefined ) {
+
+        mixer.stopAllAction();
+
+    }
+}
+
+function resetAnimations(anims) {
+
+    document.getElementById("reset").addEventListener("click", function(){
+        anims.forEach(function (clip) {
+           // mixer.clipAction(clip).paused = true;
+        });
+    });
+}
+
+ function setOptions( options ) {
+
+    var selected = animationsSelect.value;
+
+    while ( animationsSelect.children.length > 0 ) {
+
+        animationsSelect.removeChild( animationsSelect.firstChild );
+
+    }
+
+    for ( var key in options ) {
+
+        var option = document.createElement( 'option' );
+        option.value = key;
+        option.innerHTML = options[ key ];
+        animationsSelect.appendChild( option );
+
+    }
+
+    animationsSelect.value = selected;
+
+}
+
+document.getElementById("play").onclick = playAnimation;
+document.getElementById("stop").onclick = stopAnimations;
