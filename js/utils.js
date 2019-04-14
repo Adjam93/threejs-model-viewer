@@ -570,7 +570,8 @@ function playAllAnimation(anims) {
     if(anims !== undefined){
         document.getElementById("playAll").addEventListener("click", function(){
             anims.forEach(function (clip) {
-                mixer.clipAction(clip).reset().play();
+                stopAnimations();
+                mixer.clipAction(clip).play();
             });
         });
     }
