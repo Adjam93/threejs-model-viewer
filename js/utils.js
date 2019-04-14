@@ -568,12 +568,13 @@ function playAnimation() {
 function playAllAnimation(anims) {
 
     if(anims !== undefined){
-        document.getElementById("playAll").addEventListener("click", function(){
+        
+        document.getElementById("playAll").onclick = function(){
             anims.forEach(function (clip) {
-                stopAnimations();
-                mixer.clipAction(clip).play();
-            });
-        });
+                
+                 mixer.clipAction(clip).reset().play();
+             });
+        }
     }
 }       
 
