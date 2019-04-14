@@ -80,8 +80,13 @@ var loadFiles = function (files) {
             model = collada.scene;
             modelWithTextures = true;
 
+            var anims = collada.animations
+
+            addAnimation( model, anims );
+            animControl( model );
+            playAllAnimation(anims);
+            
             console.log(model);
-            var objectHasUvs = false;
 
             model.traverse(function (child) {
 
