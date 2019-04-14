@@ -35,6 +35,18 @@ body {
     color:white;      
 }
 
+
+#anims {
+    position: absolute;
+    right: 10px;
+    top: 5px;  
+    margin-top: 200px;      
+    font-family: 'Titillium Web', sans-serif;
+    font-size:14px;   
+    color:white;      
+    display: none;
+}
+
 /* Reset Select */
 select {
     -webkit-appearance: none;
