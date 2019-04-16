@@ -537,8 +537,7 @@ function playAllAnimation(anims) {
     if(anims !== undefined){
         
         document.getElementById("playAll").onclick = function(){
-            anims.forEach(function (clip) {
-                
+            anims.forEach(function (clip) {               
                  mixer.clipAction(clip).reset().play();
              });
         }
@@ -552,15 +551,6 @@ function stopAnimations() {
         mixer.stopAllAction();
 
     }
-}
-
-function resetAnimations(anims) {
-
-    document.getElementById("reset").addEventListener("click", function(){
-        anims.forEach(function (clip) {
-           // mixer.clipAction(clip).paused = true;
-        });
-    });
 }
 
  function setOptions( options ) {
@@ -583,7 +573,6 @@ function resetAnimations(anims) {
     }
 
     animationsSelect.value = selected;
-
 }
 
 document.getElementById("play").onclick = playAnimation;
