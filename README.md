@@ -4,7 +4,9 @@ An application using the Three.js library to allow user to load model files and 
 <b>Loading Models:</b>
 - Choice of inputs, either load model or load model + textures
 - Models and textures can be dragged and dropped onto the viewer
-- Current formats supported: <b>.obj</b> or obj+mtl(and textures), <b>.dae</b> or dae+textures and <b>.stl</b>
+- Current formats supported: <b>.obj</b> or obj+mtl(and textures), <b>.dae</b> or dae (+textures), <b>.stl</b>,
+  <b>GLTF (+textures)</b> and <b>FBX (+textures)</b>
+  
 - If loading a model and textures, make sure the model file and texture files are in the same folder on your system
 
 <b>Features:</b>
@@ -23,8 +25,7 @@ An application using the Three.js library to allow user to load model files and 
 - Add view helpers such as bounding box, square/circular grid underneath model and an axis
 
 <b>Potential Features:</b>
-- Load more formats e.g. FBX, GLTF, etc.
-- Support models with animations and morph targets
+- Support morph targets
 - ZIP file support
 
 <h2><a href="https://adjam93.github.io/threejs-model-viewer/" target="_blank">View the Project Online</a></h2>
