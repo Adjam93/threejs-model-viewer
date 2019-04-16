@@ -104,7 +104,7 @@ $('#glow_check').on('change', function () {
 
 function setWireFrame(mod) {
 
-    if (modelWithTextures) {
+    if (modelWithTextures || fbxLoaded || gltfLoaded) {
 
         $('#wire_check').on('change', function () {
 
@@ -161,7 +161,7 @@ function setWireframeAndModel(mod) {
 
         $('input.check').not(this).prop('checked', false);
 
-        if (modelWithTextures) {
+        if (modelWithTextures || fbxLoaded || gltfLoaded) {
             if (mod.material.length > 1) {
                 for (var i = 0; i < mod.material.length; i++) {
 
@@ -241,7 +241,7 @@ function setPhong(mod, originalMat) {
 
     $('#phong_check').on('change', function () {
 
-       if (modelWithTextures) {
+       if (modelWithTextures || fbxLoaded || gltfLoaded) {
             phong.checked ? mod.material = materials.phongMaterial : mod.material = originalMat;
           }
           else{
@@ -255,7 +255,7 @@ function setXray(mod, originalMat) {
 
     $('#xray_check').on('change', function () {
         
-       if (modelWithTextures) {
+       if (modelWithTextures || fbxLoaded || gltfLoaded) {
           xray.checked ? mod.material = materials.xrayMaterial : mod.material = originalMat;
         }
         else{
@@ -485,6 +485,7 @@ function resetRotation(mod) {
 }
 
 /*Animation Controls */
+//credit: https://raw.githubusercontent.com/mrdoob/three.js/dev/editor/js/Sidebar.Animation.js
 
 function addAnimation( object, model_animations ) {
 
