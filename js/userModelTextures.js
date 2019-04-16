@@ -10,8 +10,8 @@ modelAndTextures.addEventListener('change', function (event) {
 //LOAD AND ADD TO SCENE -> .OBJ, .MTL, .DAE AND ASSOCIATED IMAGE FILES
 var loadFiles = function (files) {
 
-    var obj_path, mtl_path, dae_path;
-    var loadingObj = false, loadingDae = false;
+    var obj_path, mtl_path, dae_path, gltf_path, fbx_path;;
+    var loadingObj = false, loadingDae = false, loadingGLTF = false, loadingFBX = false;
       
     var extraFiles = {}, file, imageFiles = [], image;
     for (var i = 0; i < files.length; i++) {
@@ -53,6 +53,28 @@ var loadFiles = function (files) {
             modelLoaded = true;
             console.log(dae_path);
         }
+        
+         if (files[i].name.match(/\w*.gltf\b/i)) {
+
+            gltf_path = files[i].name;
+            loadingGLTF = true;
+
+            scene.remove(sample_model);
+            removeModel();
+            modelLoaded = true;
+            console.log(gltf_path);
+        }
+
+        if (files[i].name.match(/\w*.fbx\b/i)) {
+
+            fbx_path = files[i].name;
+            loadingFBX = true;
+
+            scene.remove(sample_model);
+            removeModel();
+            modelLoaded = true;
+            console.log(fbx_path);
+        }
 
     }
 
@@ -72,6 +94,161 @@ var loadFiles = function (files) {
         return url;
     });
 
+     if (loadingGLTF) {
+
+        var gltf_loader = new THREE.GLTFLoader(manager);
+        gltf_loader.load(gltf_path, function (gltf) {
+
+            console.log(gltf);
+            model = gltf.scene;
+            modelWithTextures = true;
+            console.log(model);
+
+            //clone and animations
+           // var clone = AnimationUtils.clone(model);
+            var anims = gltf.animations;
+
+            console.log(anims);
+            addAnimation( model, anims );
+            animControl( model );
+            playAllAnimation(anims);
+
+            model.traverse(function (child) {
+
+                if (child.isMesh) {
+
+                    if (child.material.length > 1) {
+                        for (var i = 0; i < child.material.length; i++) {
+
+                            child.material[i].side = THREE.DoubleSide;                         
+                        }
+                    } else {
+                        child.material.side = THREE.DoubleSide;
+                    }
+
+                    console.log(child);
+
+                    console.log(child.material.map);
+
+                    numOfMeshes++;
+                    var geometry = child.geometry;
+                    stats(gltf_path, geometry, numOfMeshes);
+
+                    var wireframe2 = new THREE.WireframeGeometry(geometry);
+                    var edges = new THREE.LineSegments(wireframe2, materials.wireframeAndModel);
+                    materials.wireframeAndModel.visible = false;
+                    child.add(edges);
+
+                    setWireFrame(child);
+                    setWireframeAndModel(child);
+                   
+                    var originalMaterial = child.material;
+                    setPhong(child, originalMaterial);
+                    setXray(child, originalMaterial);
+                
+                }
+
+            });
+       
+            setCamera(model);
+            smooth.disabled = true;
+            document.getElementById('smooth-model').innerHTML = "Smooth Model (Disabled)";
+
+            setBoundBox(model);
+            setPolarGrid(model);
+            setGrid(model);
+            setAxis(model);
+
+            scaleUp(model); 
+            scaleDown(model);
+
+            fixRotation(model);
+            resetRotation(model);
+
+            model.position.set(0, 0, 0);
+
+            selectedObject = model;
+            outlinePass.selectedObjects = [selectedObject];
+            outlinePass.enabled = false;
+
+            scene.add(model);
+        });
+       
+    }
+
+    if (loadingFBX) {
+
+        var fbx_loader = new THREE.FBXLoader(manager);
+        fbx_loader.load(fbx_path, function (fbx) {
+
+            console.log(fbx);
+            model = fbx;
+            modelWithTextures = true;
+            console.log(model);
+        
+            var anims = fbx.animations;
+            addAnimation( model, anims );
+            animControl( model );
+            playAllAnimation(anims);
+            
+            model.traverse(function (child) {
+
+                if (child.isMesh) {
+
+                    if (child.material.length > 1) {
+                        for (var i = 0; i < child.material.length; i++) {
+
+                            child.material[i].side = THREE.DoubleSide;
+                        }
+                    } else {
+                        child.material.side = THREE.DoubleSide;
+                    }
+
+                    console.log(child);
+
+                    numOfMeshes++;
+                    var geometry = child.geometry;
+                    stats(fbx_path, geometry, numOfMeshes);
+
+                    var wireframe2 = new THREE.WireframeGeometry(geometry);
+                    var edges = new THREE.LineSegments(wireframe2, materials.wireframeAndModel);
+                    materials.wireframeAndModel.visible = false;
+                    child.add(edges);
+
+                    setWireFrame(child);
+                    setWireframeAndModel(child);
+
+                    var originalMaterial = child.material;
+                    setPhong(child, originalMaterial);
+                    setXray(child, originalMaterial);
+                }
+
+            });
+
+            setCamera(model);
+            smooth.disabled = true;
+            document.getElementById('smooth-model').innerHTML = "Smooth Model (Disabled)";  
+
+            setBoundBox(model);
+            setPolarGrid(model);
+            setGrid(model);
+            setAxis(model);
+
+            scaleUp(model); scaleDown(model);
+
+            fixRotation(model);
+            resetRotation(model);
+
+            model.position.set(0, 0, 0);
+
+            selectedObject = model;
+            outlinePass.selectedObjects = [selectedObject];
+            outlinePass.enabled = false;
+
+            scene.add(model);
+        });
+    }
+    
     if (loadingDae) {
         var collada_loader = new THREE.ColladaLoader(manager);
         collada_loader.load(dae_path, function (collada) {
