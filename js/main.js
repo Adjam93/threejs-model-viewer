@@ -6,6 +6,8 @@ if (!Detector.webgl) Detector.addGetWebGLMessage();
 var camera, camerHelper, scene, renderer, loader,
     stats, controls, transformControls, numOfMeshes = 0, model, modelDuplicate, sample_model, wireframe, mat, scale, delta;
 
+const manager = new THREE.LoadingManager();
+
 var modelLoaded = false, sample_model_loaded = false;
 var modelWithTextures = false, fbxLoaded = false, gltfLoaded = false;;
 var bg_Texture = false;
