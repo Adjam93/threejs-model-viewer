@@ -78,7 +78,6 @@ var loadFiles = function (files) {
 
     }
 
-    const manager = new THREE.LoadingManager();
     manager.setURLModifier(function (url, path) {
 
         url = url.replace('data:application/', '');
