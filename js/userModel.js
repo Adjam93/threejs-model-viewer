@@ -148,7 +148,7 @@ var loadFile = function (file) {
                 var contents = event.target.result;
               
                 try {
-                    var geometry = new THREE.STLLoader().parse(contents);
+                    var geometry = new THREE.STLLoader(manager).parse(contents);
                     console.log(geometry);
                 }
                 catch (err) {
@@ -233,7 +233,7 @@ var loadFile = function (file) {
 
                 var contents = event.target.result;
 
-                var loader = new THREE.ColladaLoader();
+                var loader = new THREE.ColladaLoader(manager);
 
                 try {
                     var collada = loader.parse(contents);
@@ -364,7 +364,7 @@ var loadFile = function (file) {
                 gltfLoaded = true;
 
                 var contents = event.target.result;
-                var loader = new THREE.GLTFLoader();
+                var loader = new THREE.GLTFLoader(manager);
 
                 var onError = function (err) {
                     alert("Problem parsing file: " + filename + "\n\n" + "ERROR MESSAGE: " + err.message);
