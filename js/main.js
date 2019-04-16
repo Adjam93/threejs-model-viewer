@@ -7,7 +7,7 @@ var camera, camerHelper, scene, renderer, loader,
     stats, controls, transformControls, numOfMeshes = 0, model, modelDuplicate, sample_model, wireframe, mat, scale, delta;
 
 var modelLoaded = false, sample_model_loaded = false;
-var modelWithTextures = false;
+var modelWithTextures = false, fbxLoaded = false, gltfLoaded = false;;
 var bg_Texture = false;
 
 var glow_value, selectedObject, composer, effectFXAA, position, outlinePass, ssaaRenderPass;
@@ -318,6 +318,8 @@ function removeModel() {
     numOfMeshes = 0;
     modelLoaded = false;
     modelWithTextures = false;
+    fbxLoaded = false;
+    gltfLoaded = false;
     
     if (ambient) {
         scene.remove(ambient);
