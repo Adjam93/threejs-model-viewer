@@ -270,6 +270,173 @@ var loadFile = function (file) {
             reader.readAsText(file);
 
             break;
+            
+            case 'fbx':
+
+            reader.addEventListener('load', function (event) {
+
+                scene.remove(sample_model);
+                removeModel();
+                modelLoaded = true;
+                fbxLoaded = true;
+
+                var contents = event.target.result;
+
+                var loader = new THREE.FBXLoader(manager);
+                try {
+                    model = loader.parse(contents);
+                    //console.log(fbx);
+                }
+                catch (err) {
+                    //Model fails to load due to parsing error
+                    alert("Problem parsing file: " + filename + "\n\n" + "ERROR MESSAGE: " + err.message);
+                }
+
+                if(model.animations){
+                    var anims = model.animations;
+                    addAnimation( model, anims );
+                    animControl( model );
+                    playAllAnimation(anims);
+                }
+
+                model.traverse(function (child) {
+
+                    if (child.isMesh) {
+
+                        numOfMeshes++;
+                        var geometry = child.geometry;
+                        stats(filename, geometry, numOfMeshes);
+
+                        child.material.side = THREE.DoubleSide;
+
+                        var wireframe2 = new THREE.WireframeGeometry(geometry);
+                        var edges = new THREE.LineSegments(wireframe2, materials.wireframeAndModel);
+                        materials.wireframeAndModel.visible = false;
+                        model.add(edges);
+
+                        setWireFrame(child);
+                        setWireframeAndModel(child);
+
+                        var originalMaterial = child.material;
+                        //child.material = materials.default_material3;
+                        setPhong(child, originalMaterial);
+                        setXray(child, originalMaterial);
+                    }
+                    
+                });
+
+                setCamera(model);
+                smooth.disabled = true;
+                document.getElementById('smooth-model').innerHTML = "Smooth Model (Disabled)";
+
+                model.position.set(0, 0, 0);
+
+                setBoundBox(model);
+                setPolarGrid(model);
+                setGrid(model);
+                setAxis(model);
+
+                scaleUp(model);
+                scaleDown(model);
+
+                fixRotation(model);
+                resetRotation(model);
+
+                selectedObject = model;
+                outlinePass.selectedObjects = [selectedObject];
+                outlinePass.enabled = false;
+
+                scene.add(model);
+
+            }, false);
+            reader.readAsArrayBuffer(file);
+
+            break;
+
+        case 'glb':
+        case 'gltf':
+
+            reader.addEventListener('load', function (event) {
+
+                scene.remove(sample_model);
+                removeModel();
+                modelLoaded = true;
+                gltfLoaded = true;
+
+                var contents = event.target.result;
+                var loader = new THREE.GLTFLoader();
+
+                var onError = function (err) {
+                    alert("Problem parsing file: " + filename + "\n\n" + "ERROR MESSAGE: " + err.message);
+                };
+
+                loader.parse(contents, '', function (gltf) {
+
+                    model = gltf.scene;
+                    console.log(model);
+
+                    var anims = gltf.animations;
+                    addAnimation( model, anims );
+                    animControl( model );
+                    playAllAnimation(anims);
+
+                    model.traverse(function (child) {
+
+                        if (child.isMesh) {
+
+                            numOfMeshes++;
+                            var geometry = child.geometry;
+                            stats(filename, geometry, numOfMeshes);
+
+                            child.material.side = THREE.DoubleSide;
+    
+                            var wireframe2 = new THREE.WireframeGeometry(geometry);
+                            var edges = new THREE.LineSegments(wireframe2, materials.wireframeAndModel);
+                            materials.wireframeAndModel.visible = false;
+                            model.add(edges);
+    
+                            setWireFrame(child);
+                            setWireframeAndModel(child);
+                            //child.material = materials.phongMaterial;
+
+                            var originalMaterial = child.material;
+                            console.log(originalMaterial);
+                            setPhong(child, originalMaterial);
+                            setXray(child, originalMaterial);
+                        }
+                        
+                    });
+
+
+                    setCamera(model);
+                    smooth.disabled = true;
+                    document.getElementById('smooth-model').innerHTML = "Smooth Model (Disabled)";
+
+                    model.position.set(0, 0, 0);
+
+                    setBoundBox(model);
+                    setPolarGrid(model);
+                    setGrid(model);
+                    setAxis(model);
+
+                    scaleUp(model);
+                    scaleDown(model);
+
+                    fixRotation(model);
+                    resetRotation(model);
+
+                    selectedObject = model;
+                    outlinePass.selectedObjects = [selectedObject];
+                    outlinePass.enabled = false;
+
+                    scene.add(model);
+
+                }, onError);
+
+            }, false);
+            reader.readAsArrayBuffer(file);
+
+            break;
 
         default:
 
