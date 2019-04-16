@@ -225,7 +225,7 @@ function initScene(index) {
     
     /*LOAD SAMPLE MODELS*/
     var sceneInfo = modelList[index]; //index from array of sample models in html select options
-    loader = new THREE.OBJLoader();
+    loader = new THREE.OBJLoader(manager);
     var url = sceneInfo.url;
 
     //progress/loading bar
